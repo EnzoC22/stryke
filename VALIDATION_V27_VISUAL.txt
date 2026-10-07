@@ -1,0 +1,10 @@
+STRYKE V27 — VISUAL POLISH VALIDATION
+
+VANTA: gameplay grid unchanged vs V26 = True | rows=21 | cols=23
+FROSTLINE: gameplay grid unchanged vs V26 = True | rows=19 | cols=21
+KAIRO: gameplay grid unchanged vs V26 = True | rows=16 | cols=17
+
+Competitive pool: ['vanta','frostline','kairo']
+PROTO: 19
+JavaScript module syntax: PASS (node --check)
+Visual pass: decorative meshes/lighting/floor decals only; no new gameplay collider helper calls inside v27VisualBuild.

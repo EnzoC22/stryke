@@ -1,0 +1,30 @@
+STRYKE 2.8 V22 - KAIRO REFERENCE LAYOUT
+
+Base: STRYKE 2.6 V20. The rejected V21 layout was discarded.
+Only Kairo is rebuilt in this pass; Vanta, Frostline, Red Dune and Verdant remain on the stable V20 base.
+
+REFERENCE STRUCTURE
+- Dense urban block, not an arena with scattered cubes.
+- B compound in the northwest, tighter and harder to retake.
+- A plaza in the south-center, more open.
+- Attacker spawn pocket in the southwest with two meaningful exits.
+- Defender spawn on the east side with north and south route choices.
+- West flank, north rotation street, central monolith, contested Mid, east S-route and southeast retake lane.
+- Real architecture blocks sightlines; no invisible barrier is used as the primary solution.
+
+TIMING / DISTANCE CHECK
+Attack -> A: 42 m (~6.32s at max speed)
+Defense -> A: 36 m (~5.41s)
+Defense advantage at A: ~0.90s
+Attack -> B: 72 m (~10.83s)
+Defense -> B: 66 m (~9.92s)
+Defense advantage at B: ~0.90s
+
+INITIAL VISIBILITY
+T <-> CT spawn LOS: 0/16
+T spawn LOS to A center: 0/4
+T spawn LOS to B center: 0/4
+CT spawn LOS to A center: 0/4
+CT spawn LOS to B center: 0/4
+
+Real acceleration, peeking and route choice will change live timings; these values validate the blockout relationship.

@@ -1,0 +1,7 @@
+STRYKE 2.6 V20
+
+1. Extraia o ZIP inteiro.
+2. Clique duas vezes em ABRIR_STRYKE.bat.
+3. O servidor local inicia e o navegador abre automaticamente.
+4. Se o navegador mostrar uma versao antiga, use Ctrl + F5.
+5. Para encerrar o servidor, execute FECHAR_STRYKE.bat.

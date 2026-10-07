@@ -1,0 +1,9 @@
+STRYKE V38.2 — CARGO ONLY VALIDATION
+=====================================
+- STRYKE_COMP_MAPS = [cargo].
+- Default PvP map = cargo.
+- Round fallback = cargo.
+- Deathmatch map forced to cargo.
+- PvP map selector filters to cargo only.
+- Stale localStorage PvP map is normalized to cargo.
+- JavaScript passes node --check.

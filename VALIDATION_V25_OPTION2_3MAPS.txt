@@ -1,0 +1,13 @@
+STRYKE V25 — OPTION 2 REFINED // 3 MAPAS
+
+[Vanta]
+ T→A: 12.94s | T→B: 10.06s | CT→A: 7.19s | CT→B: 6.47s
+ Ajustes: Rotação Norte quebrada com offset + cover; Hotel alto no centro; A com funnel mais fechado para T e retake melhor pro CT
+
+[Frostline]
+ T→A: 9.75s | T→B: 9.0s | CT→A: 7.5s | CT→B: 5.25s
+ Ajustes: North Rotation mais quebrada; Central Lab mais alto; A Reactor com acesso extra de retake CT
+
+[Kairo]
+ T→A: 7.5s | T→B: 8.44s | CT→A: 8.44s | CT→B: 6.56s
+ Ajustes: North Offset compacta e quebrada; Crossroad central controlado; A menos exposto para entrada do T

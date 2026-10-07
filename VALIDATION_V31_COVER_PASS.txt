@@ -1,0 +1,6 @@
+STRYKE V31 — VALIDATION
+
+- Base V30 preservada.
+- V31_COVER_PASS presente no index.html.
+- Covers adicionados aos mapas vanta/frostline/kairo.
+- JavaScript validado com node --check.

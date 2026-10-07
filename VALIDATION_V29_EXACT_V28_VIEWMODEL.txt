@@ -1,0 +1,28 @@
+STRYKE 3.5.2 — EXACT V28 ARMS / WEAPONS
+
+Base: V29.1 performance/gameplay fixes.
+Canonical visual source: STRYKE 3.4 V28 AI SUPER RESOLUTION.
+
+The following functions are byte-for-byte identical to V28:
+- gunModel: OK · sha256 b5a56b6755cc0f19
+- vmSetWeapon: OK · sha256 988aeca9f30ef38e
+- fpUpdate: OK · sha256 42639406c98aac59
+- vmMove: OK · sha256 a69c57ff54e01824
+- knViewmodel: OK · sha256 f7f88442e5f36a2a
+- knifeAnim: OK · sha256 5437605adf16471d
+- knifeInspect: OK · sha256 b4ab2291db60629c
+- weaponInspect: OK · sha256 67db6464b99398b8
+- leftOpenHand: OK · sha256 f5f05e9f51028488
+- forearm: OK · sha256 64d250f299c004d7
+- leftHand: OK · sha256 615885294c4f4b2a
+
+V29 retained:
+- performance optimizations
+- WebSR adaptive logic
+- spray fixes
+- spectator invisibility fix
+
+Removed from viewmodel:
+- V29 Epic+ inspection override/effect hook
+
+Result: first-person arms, weapons, base inspection and motion are the V28 3.4 implementation.

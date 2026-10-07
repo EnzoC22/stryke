@@ -1,0 +1,19 @@
+STRYKE V35 — COMPACT MAP VALIDATION
+
+VANTA: área jogável relativa 51.3% -> 37.7% (-26.6% vs V34)
+  live routes T/CT -> A/B: OK
+  CT pre-round -> A/B: OK
+  T pre-round -> A/B: BLOQUEADO (esperado)
+  spawn T<->CT direct LOS: 0/25
+FROSTLINE: área jogável relativa 47.9% -> 38.3% (-19.9% vs V34)
+  live routes T/CT -> A/B: OK
+  CT pre-round -> A/B: OK
+  T pre-round -> A/B: BLOQUEADO (esperado)
+  spawn T<->CT direct LOS: 0/25
+KAIRO: área jogável relativa 50.4% -> 41.9% (-16.8% vs V34)
+  live routes T/CT -> A/B: OK
+  CT pre-round -> A/B: OK
+  T pre-round -> A/B: BLOQUEADO (esperado)
+  spawn T<->CT direct LOS: 0/25
+
+JavaScript: node --check OK

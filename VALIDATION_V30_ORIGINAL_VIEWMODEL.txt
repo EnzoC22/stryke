@@ -1,0 +1,10 @@
+STRYKE V30 — VALIDAÇÃO ORIGINAL VIEWMODEL
+
+- 204 arquivos de assets/fps + assets/arms.glb comparados com o backup original: 0 diferenças.
+- 2 modelos de mão webxr comparados com o backup original: 0 diferenças.
+- JavaScript principal validado com node --check: OK.
+- frameArms restaurado para Y = -0.145 (original).
+- updateViewmodel restaurado para bob/posição base original.
+- VMOV corrida/corridaCS/deslize restaurados aos valores originais.
+- PIST corrida/corridaCS restaurados aos valores originais.
+- Inspeção no Y preservada como funcionalidade STRYKE.

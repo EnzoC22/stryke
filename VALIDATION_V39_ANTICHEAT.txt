@@ -1,0 +1,13 @@
+STRYKE V39 ANTI-CHEAT VALIDATION
+================================
+- PROTO 21.
+- DEBUG=false em localhost.
+- window.__T ausente.
+- whitelist de mensagens presente.
+- server-side ammo validation presente.
+- shot ticket precede hit no cliente.
+- hit exige ray/zone match no host.
+- distance falloff validado no host.
+- movement thresholds PvP reduzidos.
+- anomaly score ponderado + remoção automática de cliente remoto.
+- node --check: OK.

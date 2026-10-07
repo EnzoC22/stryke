@@ -1,0 +1,12 @@
+STRYKE V38 — STATIC VALIDATION
+================================
+- JavaScript principal passa node --check.
+- Room cap = 10; team cap = 5.
+- Bots UI/config suporta 0..9 e sync respeita 10 jogadores totais.
+- RC = freeze 15 / buy 10 / round 100.
+- Colliders de mapa carregam surf para áudio/impactos.
+- trace retorna surf.
+- material footsteps/impact audio presente.
+- botAssignRoles + role-aware botObj presentes.
+- clutch/ace server presentation presente.
+- assets/fps e assets/arms.glb preservados byte-for-byte em relação à V37.

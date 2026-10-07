@@ -1,0 +1,8 @@
+STRYKE V32 — STATIC VALIDATION
+
+- 3 mapas competitivos reconstruídos: Vanta, Frostline e Kairo.
+- 5 células de spawn T e 5 de spawn CT em cada mapa.
+- Rotas T/CT para A/B continuam navegáveis.
+- LOS direto entre spawns (grid approximation): 0/25 em cada mapa.
+- JavaScript principal: node --check OK.
+- Viewmodel original V30 preservado.

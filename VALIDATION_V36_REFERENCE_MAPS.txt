@@ -1,0 +1,33 @@
+STRYKE V36 — REFERENCE MAP VALIDATION
+=====================================
+
+VANTA 23x21
+- walkable fraction: 39.1%
+- T->A 59.8 m | T->B 64.4 m
+- CT->A 50.6 m | CT->B 59.8 m
+- direct T/CT spawn LOS: 0/25
+- southmost site z: 23.0; prep barriers CT 25.0 / T 29.0
+
+FROSTLINE 21x19
+- walkable fraction: 38.3%
+- T->A 67.2 m | T->B 62.4 m
+- CT->A 57.6 m | CT->B 48.0 m
+- direct T/CT spawn LOS: 0/25
+- southmost site z: 28.8; prep barriers CT 30.0 / T 34.0
+
+KAIRO 17x16
+- walkable fraction: 41.9%
+- T->A 54.0 m | T->B 54.0 m
+- CT->A 48.0 m | CT->B 42.0 m
+- direct T/CT spawn LOS: 0/25
+- southmost site z: 27.0; prep barriers CT 29.0 / T 32.0
+
+CARGO 23x19
+- walkable fraction: 41.4%
+- T->A 72.2 m | T->B 72.2 m
+- CT->A 38.0 m | CT->B 34.2 m
+- direct T/CT spawn LOS: 0/25
+- southmost site z: -15.2; prep barriers CT 6.0 / T 12.0
+
+JavaScript: node --check OK.
+All four maps have 5 T + 5 CT spawn cells and navigable routes to A/B.

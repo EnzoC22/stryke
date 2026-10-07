@@ -1,0 +1,10 @@
+STRYKE V34 — PRE-ROUND VALIDATION
+===================================
+- JavaScript node --check: OK.
+- Movimento local liberado durante freeze no modo Rodadas.
+- T/CT possuem barreiras separadas em Vanta, Frostline e Kairo.
+- Barreira aplicada no cliente e no host para posições recebidas.
+- Bots fazem setup durante freeze.
+- Compra liberada fora do spawn durante freeze.
+- Combate permanece bloqueado durante freeze.
+- Kairo CT barrier ajustada para z=28: todo o A site permanece acessível com raio do player.

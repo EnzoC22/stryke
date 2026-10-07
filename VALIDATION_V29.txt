@@ -1,0 +1,14 @@
+STRYKE V29 — STATIC VALIDATION
+===============================
+
+Checks esperados:
+- Build badge V29.
+- WebSR adaptive cadence present.
+- shadowMap.autoUpdate = false no applyQuality.
+- High shadow map = 2048.
+- composerSamples(SRAI.active ? 0 : 2).
+- bot perception throttle = PERF.botSenseHz.
+- sprayOrientation + SPRAY_GEO compartilhada.
+- target spectated não é removido do render.
+- SKIN_INSPECT contém 7 skins Épica/Lendária.
+- JavaScript module passa node --check.

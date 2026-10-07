@@ -1,0 +1,31 @@
+STRYKE V24 OPTION 2 — VALIDATION
+
+Escopo: Vanta vertical slice, não os cinco mapas.
+
+CHECKS AUTOMÁTICOS / ESTÁTICOS
+- JavaScript module syntax: node --check OK.
+- T Spawn -> CT Spawn direct grid LOS: 0 / 238.
+- T -> A: 12 cells (~8.30 s @ 6.65 m/s).
+- CT -> A: 11 cells (~7.61 s).
+- CT advantage A: ~0.69 s.
+- T -> B: 15 cells (~10.38 s).
+- CT -> B: 14 cells (~9.68 s).
+- CT advantage B: ~0.69 s.
+- V18 generic competitive blocker pass disabled for Vanta.
+- Vanta structural # cells use the grid wall system and participate in collision.
+
+NÃO VALIDADO AUTOMATICAMENTE
+- Fun factor real em 5v5.
+- Human first-contact timing com aceleração, counter-strafe e colisão entre jogadores.
+- Win rate por lado/site.
+- Qualidade de retake/post-plant em partidas humanas.
+- Rede sob ping/jitter/perda reais.
+
+PLAYTEST RECOMENDADO
+1. 5 rushes A.
+2. 5 rushes B.
+3. 5 splits Mid -> A.
+4. 5 splits Mid -> B.
+5. 5 fakes A -> B.
+6. Retake A e B com 2v3.
+7. Verificar cada canto por pixel/head-glitch/objeto atravessável.

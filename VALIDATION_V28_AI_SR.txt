@@ -1,0 +1,23 @@
+STRYKE V28 AI SR — STATIC VALIDATION
+======================================
+
+[OK] Base: V27 Visual Polish 3 Maps.
+[OK] PROTO multiplayer preservado em 19.
+[OK] Canvas Three.js original preservado: #game.
+[OK] Canvas de apresentação separado: #gameSR.
+[OK] Hook de IA ocorre depois de renderScene(), não dentro de tick().
+[OK] Nenhuma função de movimento, arma, dano, hit-reg, bot, economia ou mapa foi substituída.
+[OK] WebSR carregado sob demanda por CDN; fallback nativo se falhar.
+[OK] WebGPU detectado antes da inicialização.
+[OK] Apenas uma inferência simultânea (busy lock).
+[OK] Escala dinâmica Auto 0.45..0.65.
+[OK] Auto fallback se SR/frame-time permanecer lento.
+[OK] HUD não é submetido ao upscale.
+
+Runtime a validar em máquina com WebGPU:
+1. Configurações -> Super Resolução por IA -> WebSR Auto.
+2. Entrar em Vanta/Frostline/Kairo.
+3. Confirmar console: [STRYKE][WebSR] ativo.
+4. Ver status de IA nas configurações.
+5. Medir FPS nativo x Auto.
+6. Redimensionar/tela cheia e confirmar que o frame reaparece após a primeira inferência.

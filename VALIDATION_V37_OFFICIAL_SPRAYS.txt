@@ -1,0 +1,11 @@
+STRYKE V37 — SPRAY VALIDATION
+=============================
+- 2 PNGs locais em assets/sprays.
+- T tap -> equipped spray.
+- T hold -> two-choice selector.
+- Mouse left/right changes selection while wheel is open.
+- Release T -> save/equip/apply.
+- Server spray clamp = 0..1.
+- New profiles own both sprays.
+- Old profile spray index 2/3 migrates to TÁTICO 67.
+- JavaScript module passes node --check.

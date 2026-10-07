@@ -1,0 +1,8 @@
+STRYKE V33 — MAP BOUNDS VALIDATION
+==================================
+- V31_COVER_PASS removido.
+- Nenhum novo cover competitivo usa coordenada absoluta.
+- h/i são gerados a partir do centro da célula do grid.
+- Dimensão máxima do cover = 62% da célula.
+- Vanta/Frostline/Kairo mantêm seus envelopes e spawns.
+- JavaScript: node --check OK.

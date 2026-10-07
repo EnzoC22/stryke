@@ -1,0 +1,9 @@
+V40 SECURITY VALIDATION
+- DEBUG=false
+- __T locked undefined
+- protocol 22
+- AC_PVS + acSendPos present
+- human/bot positions filtered per recipient
+- fog handler clears remote buffer and model visibility is gated by acFog
+- debug globals are DEBUG-only
+- node --check OK
