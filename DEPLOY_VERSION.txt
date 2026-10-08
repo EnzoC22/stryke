@@ -1,0 +1,3 @@
+STRYKE 4.5 // V41 OPERATIONS UI + VISUAL OVERHAUL
+Commit base: d4a85285e81d74caeb00ea59e7c3733ef3c7757e
+Redeploy trigger: 2026-10-08
