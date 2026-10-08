@@ -25718,20 +25718,20 @@ function matchForm(el, st0) {
     const z = st.mode === 'zombies', cur = z ? st.zmap : st.map;
     const maps = Object.entries(MAPS).filter(([k, m]) => z ? !!m.zonly : k === 'cargo');
     const opts = z
-      ? \`<div class="lbl">Dificuldade</div>\${seg('zdiff', ZDIFF.map((d, i) => [i, d.name]))}<div class="zdesc"><b>\${ZDIFF[st.zdiff].name}:</b> \${ZDIFF[st.zdiff].desc}</div>\`
-      : \`<div class="optrow">\${st.mode === 'rounds' ? \`<div><div class="lbl">Rodadas para vencer</div>\${seg('rounds', [3, 5, 8, 10, 13, 16].map(n => [n, n]))}</div><div><div class="lbl">Fogo amigo</div>\${seg('ff', [[1, 'Ligado'], [0, 'Desligado']])}</div>\` : \`<div><div class="lbl">Abates para vencer</div>\${seg('frags', [10, 15, 20, 30, 50].map(n => [n, n]))}</div>\`}
-        <div><div class="lbl">Bots</div>\${seg('bots', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => [n, n]))}</div>
-        <div><div class="lbl">Nível dos bots</div>\${seg('diff', [[0, 'Treino'], [1, 'Fácil'], [2, 'Normal'], [3, 'Difícil'], [4, 'Elite']])}</div>
-        <div><div class="lbl">Bots por rank</div>\${seg('botRank', [[0, 'Manual'], [1, 'Seu rank']])}</div></div>\`;
+      ? `<div class="lbl">Dificuldade</div>${seg('zdiff', ZDIFF.map((d, i) => [i, d.name]))}<div class="zdesc"><b>${ZDIFF[st.zdiff].name}:</b> ${ZDIFF[st.zdiff].desc}</div>`
+      : `<div class="optrow">${st.mode === 'rounds' ? `<div><div class="lbl">Rodadas para vencer</div>${seg('rounds', [3, 5, 8, 10, 13, 16].map(n => [n, n]))}</div><div><div class="lbl">Fogo amigo</div>${seg('ff', [[1, 'Ligado'], [0, 'Desligado']])}</div>` : `<div><div class="lbl">Abates para vencer</div>${seg('frags', [10, 15, 20, 30, 50].map(n => [n, n]))}</div>`}
+        <div><div class="lbl">Bots</div>${seg('bots', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => [n, n]))}</div>
+        <div><div class="lbl">Nível dos bots</div>${seg('diff', [[0, 'Treino'], [1, 'Fácil'], [2, 'Normal'], [3, 'Difícil'], [4, 'Elite']])}</div>
+        <div><div class="lbl">Bots por rank</div>${seg('botRank', [[0, 'Manual'], [1, 'Seu rank']])}</div></div>`;
     const config = mapConfirmed
-      ? \`<div class="match-config-reveal"><div class="match-step-head"><span>03</span><div><b>CONFIGURAÇÃO DA PARTIDA</b><small>Ajuste as regras antes de criar a sala.</small></div></div>\${opts}</div>\`
-      : \`<div class="match-config-lock"><span>03</span><div><b>CONFIGURAÇÃO DA PARTIDA</b><small>Selecione um mapa acima para liberar rounds, bots, dificuldade e outras regras.</small></div></div>\`;
-    el.innerHTML = \`<div class="match-setup-progress"><i class="done">01</i><em></em><i class="\${mapConfirmed?'done':''}">02</i><em></em><i class="\${mapConfirmed?'active':''}">03</i></div>
+      ? `<div class="match-config-reveal"><div class="match-step-head"><span>03</span><div><b>CONFIGURAÇÃO DA PARTIDA</b><small>Ajuste as regras antes de criar a sala.</small></div></div>${opts}</div>`
+      : `<div class="match-config-lock"><span>03</span><div><b>CONFIGURAÇÃO DA PARTIDA</b><small>Selecione um mapa acima para liberar rounds, bots, dificuldade e outras regras.</small></div></div>`;
+    el.innerHTML = `<div class="match-setup-progress"><i class="done">01</i><em></em><i class="${mapConfirmed?'done':''}">02</i><em></em><i class="${mapConfirmed?'active':''}">03</i></div>
       <div class="match-step-title"><span>01</span><div><b>MODO</b><small>Escolha como a partida será jogada.</small></div></div>
-      <div class="cards">\${MODES.map(([k, t, d]) => \`<button type="button" class="card\${st.mode === k ? ' on' : ''}" data-mode="\${k}"><span class="micon">\${MICON[k]}</span><b>\${t}</b><small>\${d}</small></button>\`).join('')}</div>
+      <div class="cards">${MODES.map(([k, t, d]) => `<button type="button" class="card${st.mode === k ? ' on' : ''}" data-mode="${k}"><span class="micon">${MICON[k]}</span><b>${t}</b><small>${d}</small></button>`).join('')}</div>
       <div class="match-step-title"><span>02</span><div><b>MAPA</b><small>Escolha o campo de batalha para continuar.</small></div></div>
-      <div class="cards">\${maps.map(([k, m]) => \`<button type="button" class="card\${mapConfirmed && cur === k ? ' on' : ''}" data-map="\${k}"><div class="thumb" style="background:linear-gradient(180deg,\${hex(m.skyTop ?? m.sky)},\${hex(m.fogC ?? m.sky)} 56%,\${hex(m.theme.floor?.[1] ?? 0x555555)} 58%,#0c0d0b)"></div><b>\${m.name}</b><small>\${m.desc}</small><strong class="map-select-cta">\${mapConfirmed && cur === k ? 'SELECIONADO' : 'SELECIONAR MAPA'}</strong></button>\`).join('')}</div>
-      \${config}\`;
+      <div class="cards">${maps.map(([k, m]) => `<button type="button" class="card${mapConfirmed && cur === k ? ' on' : ''}" data-map="${k}"><div class="thumb" style="background:linear-gradient(180deg,${hex(m.skyTop ?? m.sky)},${hex(m.fogC ?? m.sky)} 56%,${hex(m.theme.floor?.[1] ?? 0x555555)} 58%,#0c0d0b)"></div><b>${m.name}</b><small>${m.desc}</small><strong class="map-select-cta">${mapConfirmed && cur === k ? 'SELECIONADO' : 'SELECIONAR MAPA'}</strong></button>`).join('')}</div>
+      ${config}`;
   };
   el.onclick = e => {
     const b = e.target.closest('button'); if (!b || !el.contains(b)) return;
