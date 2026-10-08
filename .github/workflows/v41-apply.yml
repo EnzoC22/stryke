@@ -1,11 +1,12 @@
-name: Apply STRYKE V41 Operations UI
+name: Apply STRYKE V41
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
     paths:
-      - ".github/workflows/v41-apply.yml"
-  workflow_dispatch:
+      - .github/workflows/v41-apply.yml
+  workflow_dispatch: {}
 
 permissions:
   contents: write
@@ -17,117 +18,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Patch V41 Operations UI
-        shell: bash
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path("index.html")
-          s=p.read_text(encoding="utf-8")
-          if "V41 OPERATIONS UI + VISUAL OVERHAUL" in s:
-              print("V41 already applied")
-              raise SystemExit(0)
-
-          old_nav='<nav class="tabs"><button data-tab="play" class="on">JOGAR</button><button data-tab="career">CARREIRA</button><button data-tab="rank">RANK</button><button data-tab="skins">COLEÇÃO</button><button data-tab="cases">CAIXAS</button><button data-tab="store">LOJA</button><button data-tab="social">SOCIAL</button><button data-tab="cfg">⚙</button></nav>'
-          new_nav='<nav class="tabs"><button data-tab="play" class="on">JOGAR</button><button data-tab="skins">ARSENAL</button><button data-tab="career">CARREIRA</button><button data-tab="rank">RANK</button><button data-tab="cases">INVENTÁRIO</button><button data-tab="store">LOJA</button><button data-tab="social">SOCIAL</button><button data-tab="cfg">CONFIGURAÇÕES</button></nav>'
-          if old_nav not in s: raise SystemExit("nav anchor not found")
-          s=s.replace(old_nav,new_nav,1)
-
-          old_stage='<section class="stryke-stage"><canvas id="lobbyPrev"></canvas><div class="stage-copy"><div class="eyebrow">STRYKE // TACTICAL FPS</div><h2>AIM. MOVE. WIN.</h2><p>Controle o meio, abra espaço para o time e execute o site. Movimento preciso e leitura de mapa vencem a rodada.</p><div class="stage-chips"><span>COUNTER-STRAFE</span><span>SPRAY CONTROL</span><span>TACTICAL MAPS</span><span>RANKED</span></div></div><div class="stage-rank"><small>SEASON 01</small><b id="stageRank">PRATA II</b><i></i></div></section>'
-          new_stage='<section class="stryke-stage"><canvas id="lobbyPrev"></canvas><div class="stage-copy"><div class="eyebrow">SEASON 01</div><h2>COMPETITIVE<br>TACTICAL FPS</h2><div class="stage-opline">OPERATION <span>//</span> CARGO</div><p>Disciplina, estratégia e trabalho em equipe. Monte o grupo, domine o mapa e execute cada round com leitura, utilidade e precisão.</p><div class="stage-chips"><span>COUNTER-STRAFE</span><span>SPRAY CONTROL</span><span>CLUTCH 5x5</span><span>RANKED CORE</span></div></div><div class="stage-rank"><small>RANK ATUAL</small><b id="stageRank">PRATA II</b><i></i></div><div class="stage-bottom-cards"><button class="stage-mini" data-v41tab="rank"><span>SEASON 01</span><b>RANK COMPETITIVO</b><small>Acompanhe RR, vitórias e evolução.</small></button><button class="stage-mini" data-v41tab="skins"><span>ARSENAL</span><b>COLEÇÃO & SKINS</b><small>Equipe armas e organize o loadout.</small></button><button class="stage-mini" data-v41tab="cases"><span>INVENTÁRIO</span><b>CAIXAS E RECOMPENSAS</b><small>Abra drops e compre novas caixas.</small></button></div></section>'
-          if old_stage not in s: raise SystemExit("stage anchor not found")
-          s=s.replace(old_stage,new_stage,1)
-
-          s=s.replace("<h3>Criar partida</h3>","<h3>Jogar agora</h3>",1)
-          s=s.replace("<h3>Entrar com código</h3>","<h3>Sala personalizada</h3>",1)
-          s=s.replace("STRYKE <b>4.4 // V40 ANTI-ESP + CONSOLE LOCKDOWN</b>","STRYKE <b>4.5 // V41 OPERATIONS UI + VISUAL OVERHAUL</b>",1)
-          s=s.replace("[STRYKE] V40 ANTI-ESP + CONSOLE LOCKDOWN — no debug surface + server-side visibility filtering","[STRYKE] V41 OPERATIONS UI + VISUAL OVERHAUL — unified menu, HUD and cinematic presentation",1)
-
-          # Slightly more cinematic global render without crushing visibility.
-          s=s.replace("const BLOOM0 = { s: .5, r: .45, t: .85 };","const BLOOM0 = { s: .58, r: .48, t: .88 };",1)
-          s=s.replace("renderer.toneMappingExposure = 1.15;","renderer.toneMappingExposure = 1.08;",1)
-          s=s.replace("renderer.toneMappingExposure = (M.exposure ?? 1) * (M.zombie ? VIS.k.exp : 1) * clamp(+CFG.bright || 1, .5, 2);","renderer.toneMappingExposure = (M.exposure ?? 1) * .97 * (M.zombie ? VIS.k.exp : 1) * clamp(+CFG.bright || 1, .5, 2);",1)
-
-          css=r"""
-/* ===== V41 OPERATIONS UI + VISUAL OVERHAUL ===== */
-:root{--s-red:#ff3d4d;--s-red2:#a5172a;--s-lime:#86ff47;--s-white:#eef2f6;--s-blue:#7aa8ff;--s-bg:#04070b;--s-panel:rgba(7,11,16,.82);--s-panel2:rgba(10,15,22,.9);--s-line:rgba(255,255,255,.10);--acc:var(--s-red);--acc2:var(--s-lime)}
-#menu{background:linear-gradient(90deg,rgba(2,4,7,.97),rgba(2,4,7,.84) 20%,rgba(2,4,7,.58) 48%,rgba(2,4,7,.76)),radial-gradient(circle at 77% 14%,rgba(255,61,77,.15),transparent 27%),radial-gradient(circle at 74% 18%,rgba(122,168,255,.13),transparent 34%),linear-gradient(135deg,#07101a,#020407 72%)}
-#menu .mshell{display:grid;grid-template-columns:310px minmax(0,1fr);grid-template-rows:1fr;height:100%}
-#menu .mtop{grid-column:1;grid-row:1;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:15px;height:100%;padding:25px 23px 21px;background:linear-gradient(180deg,rgba(4,8,13,.97),rgba(4,8,13,.89));border-right:1px solid rgba(255,255,255,.08);border-bottom:0;box-shadow:inset -1px 0 rgba(255,255,255,.025)}
-#menu .mlogo{font-size:48px;line-height:.9;letter-spacing:2px;font-weight:800;display:flex;align-items:center;gap:9px;color:#fff;margin-bottom:5px;text-shadow:none}
-#menu .mlogo small{display:block;font-size:9px;letter-spacing:.32em;color:#788697;margin-left:0}
-#menu .stryke-mark{width:32px;height:32px;flex:none;background:var(--s-red);font-size:21px}
-#menu .tabs{display:flex;flex-direction:column;gap:7px;flex:none;height:auto;align-items:stretch;margin:7px 0 3px}
-#menu .tabs button{opacity:1!important;position:relative;display:flex;align-items:center;justify-content:flex-start;min-height:54px;padding:0 17px;border-radius:5px;border:1px solid rgba(255,255,255,.075);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012));color:#b6c2d0;font-size:16px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;overflow:hidden}
-#menu .tabs button::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;transition:.18s}
-#menu .tabs button::after{content:'›';margin-left:auto;color:#758394;font-size:22px;transition:.18s}
-#menu .tabs button:hover{color:#fff;border-color:rgba(255,255,255,.16);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.025))}
-#menu .tabs button:hover::after{transform:translateX(2px);color:#fff}
-#menu .tabs button.on{border-color:rgba(255,61,77,.42);background:linear-gradient(90deg,rgba(255,61,77,.23),rgba(255,61,77,.055) 57%,rgba(255,255,255,.018));color:#fff}
-#menu .tabs button.on::before{background:var(--s-red);width:7px}
-#menu .hub-badges{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:2px 0 5px}
-#menu .hub-pill{padding:7px 8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.075);font:700 9px Inter,sans-serif;letter-spacing:.11em;color:#8f9eaf;text-align:center}
-#menu .hub-pill b{display:block;margin-top:3px;color:#fff;font-size:13px;font-family:Rajdhani,sans-serif}
-#menu .mplayer{margin-top:auto;min-width:0;border-radius:16px;padding:8px 11px 9px 8px;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.014));border:1px solid rgba(255,255,255,.08);box-shadow:0 18px 60px rgba(0,0,0,.35)}
-#menu .mav{width:52px;height:52px;border-radius:13px;background:linear-gradient(135deg,var(--s-red),#b5182b);font-size:25px;color:#fff;box-shadow:0 10px 22px rgba(255,61,77,.22)}
-#menu .mpinfo input{font-size:21px;letter-spacing:.04em}
-#menu .mpsub{font-size:11px;letter-spacing:.08em;color:#9aa8b8}#menu .mpsub b{color:var(--s-lime)}
-#menu .mpxp{height:5px;border-radius:20px;background:rgba(255,255,255,.09)}#menu .mpxp i{background:linear-gradient(90deg,var(--s-red),#ff7b86)}
-#menu .mbody{grid-column:2;grid-row:1;position:relative;overflow:auto;padding:27px 29px}
-#menu .mbody>[data-pane]{max-width:none;margin:0 auto 0 0}
-#menu .box,#menu .store-item,#menu .case-stat,#menu .hub-card,#menu .rank-card,#menu .rank-ladder,#menu .vcoll{background:linear-gradient(180deg,rgba(7,11,16,.86),rgba(8,13,20,.75));border:1px solid rgba(255,255,255,.08);border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,.26);backdrop-filter:blur(10px)}
-.playgrid{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:18px;align-items:start}
-.stryke-stage{grid-column:1;grid-row:2 / span 2;min-height:670px;height:auto;position:relative;overflow:hidden;border-radius:26px;border:1px solid rgba(255,255,255,.09);clip-path:none;box-shadow:0 28px 90px rgba(0,0,0,.38);background:radial-gradient(circle at 74% 18%,rgba(255,61,77,.13),transparent 21%),radial-gradient(circle at 75% 23%,rgba(122,168,255,.12),transparent 30%),linear-gradient(135deg,#08111a,#020508 76%)}
-.stryke-stage::before{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(90deg,rgba(4,8,12,.9) 0%,rgba(4,8,12,.72) 33%,rgba(4,8,12,.12) 67%,rgba(4,8,12,.5) 100%),linear-gradient(180deg,rgba(255,255,255,.03),transparent 18%,transparent 86%,rgba(255,61,77,.05)),repeating-linear-gradient(90deg,rgba(255,255,255,.012) 0 1px,transparent 1px 62px)}
-.stryke-stage::after{content:'';position:absolute;inset:auto -5% -22% 38%;height:66%;z-index:2;pointer-events:none;background:radial-gradient(ellipse at center,rgba(255,61,77,.11),transparent 54%)}
-#lobbyPrev{position:absolute;inset:-10% -8% -8% 28%;width:80%;height:116%;z-index:1;filter:saturate(.78) contrast(1.14) brightness(.74) drop-shadow(0 24px 80px #000)}
-.stage-copy{position:absolute;left:40px;top:39px;max-width:500px;z-index:3}.stage-copy .eyebrow{color:var(--s-red);font:700 12px Inter,sans-serif;letter-spacing:.34em;text-transform:uppercase}
-.stage-copy h2{font:800 76px/.88 Rajdhani,sans-serif;letter-spacing:.015em;margin:11px 0 7px;color:#fff;text-shadow:0 10px 50px rgba(0,0,0,.46)}
-.stage-opline{font:700 24px/1 Rajdhani,sans-serif;letter-spacing:.08em;color:#dce5ef;margin:18px 0}.stage-opline span{color:var(--s-red);margin:0 8px}
-.stage-copy p{margin:0;color:#c0cbd8;font:500 14px/1.52 Inter,sans-serif;max-width:410px}.stage-chips{display:flex;gap:9px;margin-top:17px;flex-wrap:wrap}.stage-chips span{padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.10);font:700 10px Inter,sans-serif;letter-spacing:.13em;color:#dbe4ee}
-.stage-rank{position:absolute;left:40px;bottom:154px;right:auto;top:auto;padding:17px 19px;min-width:270px;background:linear-gradient(180deg,rgba(7,11,16,.88),rgba(7,11,16,.64));border:1px solid rgba(255,255,255,.08);border-radius:18px;box-shadow:0 14px 50px rgba(0,0,0,.25);text-align:left;z-index:3}.stage-rank small{display:block;color:#89a4c1;font:700 9px Inter,sans-serif;letter-spacing:.25em;text-transform:uppercase}.stage-rank b{display:block;margin-top:6px;font:800 34px Rajdhani,sans-serif;letter-spacing:.08em;color:#fff}.stage-rank i{display:block;width:100%;height:7px;border-radius:30px;margin-top:13px;background:linear-gradient(90deg,var(--s-red),#ff8d75)}
-.stage-bottom-cards{position:absolute;left:22px;right:22px;bottom:22px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;z-index:3}.stage-mini{padding:15px 17px 17px;text-align:left;border-radius:16px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(7,11,16,.86),rgba(7,11,16,.67));color:#fff;backdrop-filter:blur(10px);transition:.16s;box-shadow:0 12px 40px rgba(0,0,0,.22)}.stage-mini:hover{transform:translateY(-2px);border-color:rgba(255,61,77,.38);background:linear-gradient(180deg,rgba(255,61,77,.16),rgba(7,11,16,.76))}.stage-mini span{display:block;font:700 9px Inter,sans-serif;letter-spacing:.23em;color:#8ba0b6;margin-bottom:7px}.stage-mini b{display:block;font:800 20px/1 Rajdhani,sans-serif;letter-spacing:.04em;color:#fff;margin-bottom:6px}.stage-mini small{display:block;color:#b7c3d1;font:500 11px/1.4 Inter,sans-serif}
-#hostBox{grid-column:2;grid-row:2}#pside{grid-column:2;grid-row:3;display:flex;flex-direction:column;gap:14px}#hostBox h3,#joinBox h3,#sideFr h3{text-transform:uppercase;letter-spacing:.21em}#hostBox .actbar{display:grid;grid-template-columns:1fr;gap:9px;margin-top:18px}#hostBox .actbar #btnHostPriv{order:2}
-#menu button.big{clip-path:none;border-radius:16px;padding:15px 19px;min-height:56px;background:linear-gradient(180deg,#ff4e5d,#cc2137);box-shadow:0 14px 34px rgba(255,61,77,.22)}#menu button.big.alt,#menu #lbOut{background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.14);color:#edf3fa}#joinBox input{border-radius:13px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.10)}
-#menu .career-list>div,#menu .rank-tier,#menu .rank-match,.store-item,.vtile,.skc,.bmc{border-radius:15px}.rank-hero{border-radius:22px;overflow:hidden;background:linear-gradient(135deg,rgba(255,61,77,.16),rgba(122,168,255,.06),rgba(0,0,0,.15));border:1px solid rgba(255,255,255,.08);box-shadow:0 24px 80px rgba(0,0,0,.26)}.stryke-build{right:15px;bottom:13px;padding:7px 11px;border-radius:999px;background:rgba(4,8,12,.58);backdrop-filter:blur(8px)}
-#click{padding:12px 20px;border-radius:16px;background:rgba(7,11,16,.88);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(10px);box-shadow:0 18px 50px rgba(0,0,0,.32)}
-#hp{left:20px;bottom:18px;padding:10px 14px 9px;background:linear-gradient(180deg,rgba(7,11,16,.85),rgba(7,11,16,.52));border:1px solid rgba(255,255,255,.08);border-left:4px solid var(--s-red);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.22)}#hp small{font-size:10px;color:#9cacbd;letter-spacing:.17em}
-#money{left:22px;bottom:92px;padding:7px 11px;background:rgba(7,11,16,.78);border:1px solid rgba(255,255,255,.08);border-radius:13px;color:var(--s-lime)}
-#ammo{right:20px;bottom:18px;padding:10px 14px 9px;background:linear-gradient(180deg,rgba(7,11,16,.85),rgba(7,11,16,.52));border:1px solid rgba(255,255,255,.08);border-right:4px solid var(--s-red);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.22)}#ammo small{color:#93a4b6}#ammo .wn{color:#dce6f2}
-#hpbar{bottom:26px;width:min(350px,62vw)}#hpbar .hbt{margin-bottom:7px;color:#9db0c1}#hpbar .hbar{height:11px;border-radius:999px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.10)}#hpbar .hbar .fill{background:linear-gradient(90deg,var(--s-red),#ff8b72)!important}#hpbar .hbar .trail{background:#ffffff72}
-#reload{height:6px;border-radius:999px;background:rgba(255,255,255,.10)}#reload i{background:linear-gradient(90deg,var(--s-red),#ff8b72)}
-#board{border-radius:20px;padding:20px 24px;background:linear-gradient(180deg,rgba(7,11,16,.92),rgba(8,12,18,.88));border:1px solid rgba(255,61,77,.18);box-shadow:0 24px 80px rgba(0,0,0,.42);backdrop-filter:blur(12px)}#board th{color:#8d9fb1;letter-spacing:.08em}#board td{border-top:1px solid rgba(255,255,255,.06)}#board tr.me td{color:var(--s-lime)}
-#buy{background:radial-gradient(circle at 50% 0%,rgba(255,61,77,.12),transparent 24%),linear-gradient(180deg,rgba(5,8,12,.96),rgba(3,5,8,.98))}.bmwrap{padding:23px;border-radius:26px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(7,11,16,.91),rgba(8,12,18,.83));box-shadow:0 30px 90px rgba(0,0,0,.45);backdrop-filter:blur(12px)}.bmh b,.bmcred{color:var(--s-lime)}.bmc{border-radius:16px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02))}.bmc:hover{border-color:rgba(255,61,77,.32);background:linear-gradient(180deg,rgba(255,61,77,.14),rgba(255,255,255,.03))}.bmc.own{border-color:rgba(255,61,77,.42);background:linear-gradient(180deg,rgba(255,61,77,.18),rgba(255,61,77,.04))}
-#chatlog div{background:rgba(7,11,16,.76);border-left:2px solid rgba(255,61,77,.56);border-radius:8px;padding:4px 10px;color:#dfe6ef;backdrop-filter:blur(8px)}#chatin{border-radius:13px;background:rgba(7,11,16,.9);border:1px solid rgba(255,255,255,.10)}#toast{top:68px;padding:10px 18px;border-radius:15px;background:rgba(7,11,16,.88);border:1px solid rgba(255,61,77,.2);box-shadow:0 18px 50px rgba(0,0,0,.32);backdrop-filter:blur(10px)}
-@media(max-width:1100px){#menu .mshell{grid-template-columns:270px minmax(0,1fr)}.stage-copy h2{font-size:64px}.stage-bottom-cards{grid-template-columns:1fr}.stage-rank{bottom:246px}}
-@media(max-width:940px){#menu .mshell{display:flex;flex-direction:column}#menu .mtop{height:auto;padding:15px;border-right:0;border-bottom:1px solid rgba(255,255,255,.08)}#menu .mlogo{font-size:36px}#menu .tabs{flex-direction:row;flex-wrap:wrap}#menu .tabs button{flex:1 1 calc(50% - 8px);min-height:44px;font-size:13px}#menu .mbody{padding:17px 15px 22px}.playgrid{grid-template-columns:1fr}.stryke-stage{grid-column:1;grid-row:auto;min-height:600px}#hostBox,#pside{grid-column:1;grid-row:auto}}
-@media(max-width:720px){.stryke-stage{min-height:550px}.stage-copy{left:23px;top:25px;max-width:320px}.stage-copy h2{font-size:46px}.stage-opline{font-size:18px}.stage-copy p{font-size:12px}.stage-rank{left:23px;right:23px;bottom:160px;min-width:0}.stage-bottom-cards{left:13px;right:13px;bottom:13px;gap:9px}.stage-mini{padding:11px 13px}.stage-mini b{font-size:17px}}
-"""
-          s=s.replace("</style>",css+"\n</style>",1)
-
-          # Add simple navigation for the new hero cards.
-          hook="document.querySelectorAll('#menu .tabs button').forEach(b => b.onclick = () => {"
-          navjs="""document.addEventListener('click',e=>{const b=e.target.closest('[data-v41tab]');if(!b)return;document.querySelector('#menu .tabs [data-tab="'+b.dataset.v41tab+'"]')?.click();});\n"""
-          if hook not in s: raise SystemExit("tab hook not found")
-          s=s.replace(hook,navjs+hook,1)
-
-          p.write_text(s,encoding="utf-8")
-          print("V41 patched",len(s))
-          PY
-
+      - name: Apply V41
+        run: python3 tools/apply_v41.py
       - name: Validate
         run: |
           grep -q "V41 OPERATIONS UI + VISUAL OVERHAUL" index.html
           grep -q "COMPETITIVE<br>TACTICAL FPS" index.html
           git diff --check
-
-      - name: Commit V41
+      - name: Commit
         run: |
-          if git diff --quiet; then
-            echo "No changes"
-            exit 0
-          fi
+          if git diff --quiet; then exit 0; fi
           git config user.name "STRYKE Build Bot"
           git config user.email "actions@users.noreply.github.com"
           git add index.html
