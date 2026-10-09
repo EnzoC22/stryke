@@ -1,0 +1,56 @@
+name: Apply STRYKE V42
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/v42-apply.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply V42 mode selection
+        run: python3 tools/apply_v42_menu.py
+
+      - name: Apply V42 mobile controls
+        run: python3 tools/apply_v42_mobile.py
+
+      - name: Validate V42
+        run: |
+          grep -q "V42 MODE SELECT + MOBILE" index.html
+          grep -q "mode-select-v42" index.html
+          grep -q 'id="mobileControls"' index.html
+          grep -q "function mobileBind" index.html
+          grep -q "const MOBILE" index.html
+          git diff --check
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path("index.html").read_text(encoding="utf-8")
+          m=re.search(r'<script type="module">(.*)</script>\s*</body>',s,re.S)
+          if not m: raise SystemExit("module script not found")
+          Path("/tmp/stryke-v42.mjs").write_text(m.group(1),encoding="utf-8")
+          PY
+          node --check /tmp/stryke-v42.mjs
+
+      - name: Commit V42
+        run: |
+          if git diff --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+          git config user.name "STRYKE Build Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "STRYKE V42 mode selection and mobile controls"
+          git push
