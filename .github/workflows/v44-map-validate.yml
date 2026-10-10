@@ -1,0 +1,44 @@
+name: STRYKE V44 Competitive Map Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/v44-map-validate.yml
+      - tools/v44_map_smoke.mjs
+      - index.html
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  map-navigation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check scripts before installing browsers
+        run: |
+          node --check tools/v44_map_smoke.mjs
+          node --check tools/v43_mobile_smoke.mjs
+      - name: Install browser
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Serve local snapshot
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/stryke-v44-http.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS -o /dev/null http://127.0.0.1:8765/; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/stryke-v44-http.log
+          exit 1
+      - name: Inspect live map geometry, bot navigation, spawns and bombsites
+        run: node tools/v44_map_smoke.mjs
+      - name: Ensure V43 touch interactions continue to pass
+        run: node tools/v43_mobile_smoke.mjs
