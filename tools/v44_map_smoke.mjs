@@ -13,6 +13,20 @@ function withHooks(html) {
   const hooks = `
     // V44 read-only map probes: injected into test response, not shipped.
     window.__strykeV44 = {
+      isolatedNavigation: () => {
+        const prior = NAV;
+        try {
+          NAV = { nodes: [
+            {x:0,z:0,n:[]}, {x:30,z:30,n:[]}
+          ]};
+          const disconnected = navPath(0,0,30,30);
+          NAV = null;
+          const noGraph = navPath(0,0,30,30);
+          return {disconnected,noGraph};
+        } finally {
+          NAV = prior;
+        }
+      },
       inspect: (id) => {
         const map = MAPS[id];
         if (!map || !map.sites || !map.bomb) throw Error('not a competitive map: ' + id);
@@ -168,6 +182,10 @@ try {
     assert.equal(result.spawnData.t.length,5,'incorrect T spawns '+id);
     assert.equal(result.spawnData.ct.length,5,'incorrect CT spawns '+id);
   }
+  const unreachableProof=await page.evaluate(()=>window.__strykeV44.isolatedNavigation());
+  assert.deepEqual(unreachableProof.disconnected,[], 'disconnected bot path must not return a straight line through walls');
+  assert.deepEqual(unreachableProof.noGraph,[], 'missing navigation graph must not return unsafe straight-line route');
+  console.log('PASS V44 bot fallback: disconnected and uninitialized graphs return no route');
   const blockers=results.flatMap(r=>['t','ct'].flatMap(t=>r.spawnData[t].flatMap(s=>
     !s.free?[r.id+' '+t+' blocked spawn '+JSON.stringify(s.point)]:[])));
   const missingRoutes=results.flatMap(r=>['t','ct'].flatMap(t=>r.spawnData[t].flatMap(s=>
