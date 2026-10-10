@@ -83,6 +83,29 @@ function withHooks(html) {
           point:p,free:footFree(p[0],p[1]),nearest:nearest(p[0],p[1]),
           toSite:Object.fromEntries(['A','B'].map(k=>[k,sites[k].point?shortest(p,sites[k].point):null]))
         }));
+        const trialPoints=[];
+        if(['frostline','kairo','cargo'].includes(id)){
+          const trialTeam = id==='cargo'?'t':'ct';
+          const xs=id==='cargo'?[-11,-8,-5,-2,1,4,7,10]:[6,10,14,18,22,26,30];
+          const zs=id==='cargo'?[13,16,19,22,25]:[-36,-32,-28,-24,-20,-16,-12];
+          const foes=spawns[trialTeam==='ct'?'t':'ct'];
+          for(const x of xs)for(const z of zs){
+            if(!footFree(x,z))continue;
+            const clamped=preClampXZ(trialTeam,x,z);
+            if(Math.hypot(clamped[0]-x,clamped[1]-z)>.05)continue;
+            if(foes.some(p=>segClear(x,z,p[0],p[1])))continue;
+            const a=shortest([x,z],sites.A.point)?.distance;
+            const b=shortest([x,z],sites.B.point)?.distance;
+            if(!Number.isFinite(a)||!Number.isFinite(b))continue;
+            const gap=Math.min(...foes.map(p=>Math.hypot(x-p[0],z-p[1])));
+            if(gap<30)continue;
+            const score=id==='frostline'?Math.abs(a-61)+Math.abs(b-63)*.14:
+              id==='kairo'?Math.abs(b-58)+Math.abs(a-55)*.1:
+                Math.abs(a-63)+Math.abs(b-63);
+            trialPoints.push({point:[x,z],a,b,gap:Math.round(gap),score:Math.round(score*10)/10});
+          }
+          trialPoints.sort((a,b)=>a.score-b.score);
+        }
         const clearSightlines=spawns.t.flatMap(a=>spawns.ct.map(b=>segClear(a[0],a[1],b[0],b[1]))).filter(Boolean).length;
         const closest={};
         for(const site of ['A','B'])closest[site]=Object.fromEntries(['t','ct'].map(team=>{
@@ -91,7 +114,7 @@ function withHooks(html) {
         }));
         return {id,size:[map.w,map.d],siteCount:Object.keys(map.sites).length,
           navNodes:nodes.length,components:sizes.sort((a,b)=>b-a).slice(0,12),
-          spawnData,sites,closest,clearSightlines, collisionBoxes:COL.length};
+          spawnData,sites,closest,clearSightlines,trialPoints:trialPoints.slice(0,12),collisionBoxes:COL.length};
       }
     };
   `;
@@ -174,7 +197,8 @@ try {
       sightlines:result.clearSightlines,
       spawnRoutes:Object.fromEntries(['t','ct'].map(t=>[t,result.spawnData[t].map(v=>({p:v.point,a:v.toSite.A?.distance,b:v.toSite.B?.distance}))])),
       closest:result.closest,
-      sites:Object.fromEntries(['A','B'].map(k=>[k,{plantableSamples:result.sites[k].plantableSamples,point:result.sites[k].point}]))
+      sites:Object.fromEntries(['A','B'].map(k=>[k,{plantableSamples:result.sites[k].plantableSamples,point:result.sites[k].point}])),
+      trialPoints:result.trialPoints
     };
     console.log('V44 MAP REPORT',JSON.stringify(report));
     assert(result.navNodes>0,'no nav nodes on '+id);
