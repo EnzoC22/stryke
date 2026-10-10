@@ -1,5 +1,5 @@
 name: Apply STRYKE V43 Mobile Fixes
-# Retry after verified multi-style HTML support
+# Retry after Python script escape correction
 
 on:
   push:
