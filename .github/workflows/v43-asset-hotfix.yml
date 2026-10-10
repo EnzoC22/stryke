@@ -1,0 +1,66 @@
+name: Apply STRYKE V43 Asset Hotfix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/v43-asset-hotfix.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply narrowly scoped fix
+        run: python3 tools/fix_v43_literal_image_urls.py
+
+      - name: Validate syntax and diff
+        run: |
+          git diff --check
+          test "$(git diff --name-only)" = "index.html"
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import subprocess
+          import sys
+          class Scripts(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.capturing = False
+                  self.parts = []
+                  self.scripts = []
+              def handle_starttag(self, tag, attrs):
+                  if tag == 'script':
+                      attrs = dict(attrs)
+                      self.capturing = 'src' not in attrs and attrs.get('type', '').lower() in ('', 'module', 'text/javascript')
+                      self.parts = []
+              def handle_data(self, data):
+                  if self.capturing: self.parts.append(data)
+              def handle_endtag(self, tag):
+                  if tag == 'script':
+                      if self.capturing: self.scripts.append(''.join(self.parts))
+                      self.capturing = False
+          s=Path('index.html').read_text(encoding='utf-8')
+          scripts=Scripts()
+          scripts.feed(s)
+          if not scripts.scripts: sys.exit('No scripts detected')
+          for i, code in enumerate(scripts.scripts, 1):
+              r=subprocess.run(['node','--check','--input-type=module'], input=code, text=True, capture_output=True)
+              if r.returncode: sys.exit('JavaScript block '+str(i)+': '+r.stderr)
+          print('Validated', len(scripts.scripts), 'inline scripts')
+          PY
+
+      - name: Commit verified fix
+        run: |
+          git config user.name "STRYKE Build Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "Fix STRYKE V43 literal image preloading requests"
+          git push
