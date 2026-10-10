@@ -27,15 +27,6 @@ function withHooks(html) {
           NAV = prior;
         }
       },
-      previewCargo: () => {
-        const original = MAPS.cargo.spawns;
-        try {
-          MAPS.cargo.spawns = [[-8,13],[-5,13],[-2,13],[1,13],[4,13]];
-          return window.__strykeV44.inspect('cargo');
-        } finally {
-          MAPS.cargo.spawns = original;
-        }
-      },
       inspect: (id) => {
         const map = MAPS[id];
         if (!map || !map.sites || !map.bomb) throw Error('not a competitive map: ' + id);
@@ -238,22 +229,13 @@ try {
       assert(result.closest.A.ct<=62 && result.closest.B.ct<=60,'Kairo CT spawn balance regressed');
     }
   }
-  const cargoTrial = await page.evaluate(() => window.__strykeV44.previewCargo());
-  const trialReport = {
-    closest:cargoTrial.closest,
-    spawns:cargoTrial.spawnData.t.map(sp=>({p:sp.point,free:sp.free,a:sp.toSite.A?.distance,b:sp.toSite.B?.distance})),
-    sightlines:cargoTrial.clearSightlines,
-    connectivity:cargoTrial.components,
-  };
-  console.log('V44 CARGO PREVIEW',JSON.stringify(trialReport));
-  assert(cargoTrial.spawnData.t.length===5,'Cargo preview must have five attackers');
-  assert(cargoTrial.spawnData.t.every(sp=>sp.free && sp.toSite.A && sp.toSite.B),'Cargo preview invalid T positions/routes');
-  assert.equal(cargoTrial.clearSightlines,0,'Cargo preview introduces direct spawn sightlines');
-  assert(cargoTrial.closest.A.ct<cargoTrial.closest.A.t && cargoTrial.closest.B.ct<cargoTrial.closest.B.t,
-    'Cargo preview must retain defender early-site advantage');
-  assert(cargoTrial.closest.A.t-cargoTrial.closest.A.ct<=20 &&
-         cargoTrial.closest.B.t-cargoTrial.closest.B.ct<=20,
-    'Cargo preview still leaves excessive defender advantage');
+  const cargo = results.find(r=>r.id==='cargo');
+  assert(cargo,'Cargo missing from competitive map scan');
+  for(const site of ['A','B']){
+    const advantage=cargo.closest[site].t-cargo.closest[site].ct;
+    assert(advantage>=0.5 && advantage<=20,'Cargo '+site+' arrival advantage outside V44 bounds: '+advantage);
+  }
+  console.log('PASS V44 Cargo arrival balance: CT retains moderate advantage on both bombsites');
   const unreachableProof=await page.evaluate(()=>window.__strykeV44.isolatedNavigation());
   assert.deepEqual(unreachableProof.disconnected,[], 'disconnected bot path must not return a straight line through walls');
   assert.deepEqual(unreachableProof.noGraph,[], 'missing navigation graph must not return unsafe straight-line route');
