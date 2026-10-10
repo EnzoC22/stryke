@@ -64,7 +64,13 @@ async function boot(page, label) {
   await page.locator('#btnHost').waitFor({state: 'attached', timeout: 45000});
   await page.waitForTimeout(3000);
   const brokenImages = await page.evaluate(() => [...document.querySelectorAll('img[src]')]
-    .filter(el => el.getAttribute('src')?.includes('
+    .filter(el => el.getAttribute('src')?.includes(String.fromCharCode(36,123,117,114,108,125)))
+    .slice(0, 5).map(el => ({
+      html: el.outerHTML.slice(0, 500),
+      parent: el.parentElement?.outerHTML.slice(0, 650)
+    })));
+  if (brokenImages.length) console.log(label, 'broken image elements:', JSON.stringify(brokenImages));
+  if (errors.length) throw Error(label + ' JavaScript exceptions: ' + errors.join(' | '));
   console.log('PASS', label, 'boot, menu visible, no uncaught JavaScript errors');
 }
 
