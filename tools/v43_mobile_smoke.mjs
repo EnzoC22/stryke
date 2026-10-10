@@ -67,6 +67,14 @@ async function boot(page, label) {
   page.on('response', response => {
     if (response.status() === 404) console.log(label, 'missing resource:', response.url());
   });
+  const debugNetwork = await page.context().newCDPSession(page);
+  debugNetwork.on('Network.requestWillBeSent', request => {
+    if (request.request?.url?.includes('%7Burl%7D')) {
+      console.log(label, 'BROKEN_NETWORK_INITIATOR:', request.type,
+        JSON.stringify(request.initiator).slice(0, 2200));
+    }
+  });
+  await debugNetwork.send('Network.enable');
   const response = await page.goto(base, {waitUntil: 'domcontentloaded', timeout: 60000});
   assert.equal(response.status(), 200, label + ' HTML returned non-200 status');
   await page.locator('#menu').waitFor({state: 'visible', timeout: 45000});
