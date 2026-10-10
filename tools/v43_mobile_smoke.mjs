@@ -68,7 +68,7 @@ async function boot(page, label) {
     .slice(0, 5).map(el => ({
       html: el.outerHTML.slice(0, 500),
       parent: el.parentElement?.outerHTML.slice(0, 650)
-    }));
+    })));
   if (brokenImages.length) console.log(label, 'broken image elements:', JSON.stringify(brokenImages));
   if (errors.length) throw Error(label + ' JavaScript exceptions: ' + errors.join(' | '));
   console.log('PASS', label, 'boot, menu visible, no uncaught JavaScript errors');
