@@ -68,7 +68,7 @@ async function boot(page, label) {
   page.on('response', response => {
     if (response.status() === 404) {
       console.log(label, 'missing resource:', response.url());
-      if (response.url().includes('%7Burl%7D')) badImageRequests.push(response.url());
+      if (response.request().resourceType() === 'image') badImageRequests.push(response.url());
     }
   });
   const debugNetwork = await page.context().newCDPSession(page);
@@ -91,7 +91,7 @@ async function boot(page, label) {
       parent: el.parentElement?.outerHTML.slice(0, 650)
     })));
   if (brokenImages.length) console.log(label, 'broken image elements:', JSON.stringify(brokenImages));
-  if (badImageRequests.length) throw Error(label + ' attempted literal placeholder asset URL: ' + badImageRequests.join(' | '));
+  if (badImageRequests.length) throw Error(label + ' encountered missing image URL: ' + badImageRequests.join(' | '));
   if (errors.length) throw Error(label + ' JavaScript exceptions: ' + errors.join(' | '));
   console.log('PASS', label, 'boot, menu visible, no uncaught JavaScript errors');
 }
