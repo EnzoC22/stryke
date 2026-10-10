@@ -1,0 +1,54 @@
+name: STRYKE V43 Browser Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/v43-browser-smoke.yml
+      - tools/v43_mobile_smoke.mjs
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify published V43 via HTTP
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fSL --retry 3 --retry-delay 2 --connect-timeout 15 --max-time 90 \
+            -o /tmp/stryke-published.html \
+            -w "Published site HTTP %{http_code}, %{size_download} bytes\n" \
+            'https://enzoc22.github.io/stryke/?smoke=v43'
+          grep -q 'V43 MOBILE INTERACTION FIXES' /tmp/stryke-published.html
+          echo "PASS live GitHub Pages V43 content reachable and present"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+
+      - name: Start a local copy of the published repository
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/stryke-http.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS -o /dev/null http://127.0.0.1:8765/; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/stryke-http.log
+          exit 1
+
+      - name: Run desktop startup and mobile UI interaction tests
+        env:
+          STRYKE_TEST_URL: http://127.0.0.1:8765/
+        run: node tools/v43_mobile_smoke.mjs
