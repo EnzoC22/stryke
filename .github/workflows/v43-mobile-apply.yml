@@ -1,4 +1,5 @@
 name: Apply STRYKE V43 Mobile Fixes
+# Retry after verified multi-style HTML support
 
 on:
   push:
