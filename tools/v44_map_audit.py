@@ -26,3 +26,20 @@ print("\n### FIRST OCCURRENCE GRID AND MAP SETUP")
 for word in ("const MAPS", "const MAP_IDS", "const MAP=", "createMap(", "buildMap(", "mapId", "curMapId", "spawnT", "ctSpawn", "GRID", "NAV", "pathfind", "getSpawn", "walkable", "bombSites", "SPAWN", "MAP_LAYOUTS", "mapSpecs"):
     pos=s.find(word)
     if pos>=0: print(word,"AT",pos,"CONTEXT",repr(s[max(0,pos-200):pos+1100]))
+
+print("\\n### MAP ASSIGNMENTS / OVERRIDES")
+for pat in [r"MAPS\\.(?:vanta|frostline|kairo|cargo)\\s*=",r"Object\\.assign\\(MAPS",r"\\.spawns\\s*=",r"\\.sites\\s*=",r"SPAWNS\\.a\\s*=",r"SPAWNS\\.b\\s*=",r"SPAWNS\\[",r"buildNav\\(",r"navPath\\("]:
+    print("PATTERN",pat)
+    found=list(re.finditer(pat,s))
+    print("COUNT",len(found))
+    for m in found[:18]:
+        print("AT",m.start(),"LINE",s.count("\\n",0,m.start())+1,"CTX",repr(s[max(0,m.start()-200):m.start()+360]))
+print("\\n### COMPLETE NAV BLOCK")
+a=s.find("function buildNav(M)");b=s.find("// ----------",a+20)
+print(s[a:min(a+5600,b if b>=0 else a+5600)])
+print("\\n### BUILD MAP SPAWNS")
+a=s.find("function buildMap(id)")
+for marker in ("SPAWNS.a","SPAWNS.b","buildNav(","COL.push","M.boxes","SPAWNS["):
+    x=s.find(marker,a)
+    if x>=0 and x<a+16000:
+        print("BUILD MAP", marker,repr(s[x-400:x+900]))
