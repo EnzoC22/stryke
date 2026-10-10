@@ -17017,6 +17017,16 @@ ATMOS_POST.push((mapId, AT, M) => {
   }
   if (bat.length) put(mergeGeos(bat), worldMat('batente', SAN1.batente, true), true);
 });
+/* V44 COMPETITIVE SPAWN BALANCE */
+// The five-spawn squads and all original map collision/cover assets are preserved.
+// Shift a single CT start on Frostline/Kairo to allow early A/B defensive setups.
+if (MAPS.frostline?.spawnsB?.length === 5 && MAPS.kairo?.spawnsB?.length === 5) {
+  MAPS.frostline.spawnsB[0] = [14, -24];
+  MAPS.kairo.spawnsB[0] = [10, -28];
+} else {
+  console.warn('[STRYKE V44] Balanced spawns not applied: map structure changed');
+}
+
 function buildMap(id) {
   const M = MAPS[id] || MAPS.arena; curMapId = MAPS[id] ? id : 'arena'; curMap = M; texZ = curMapId === 'vila'; // texturas da fase 3 só na Vila (o Sanatório recebe as dele na fase 5)
   texS = curMapId === 'sanatorio'; // 5B-1
