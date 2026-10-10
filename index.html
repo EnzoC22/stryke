@@ -25608,7 +25608,7 @@ function renderBuy() {
   const card = (id, gear) => {
     const w = W[id], up = id === 'helmet' && me.armor >= 100 && !me.helmet, pr = free ? 0 : up ? 350 : w.price, own = G.inv.primary === id || G.inv.secondary === id || (id === 'kevlar' && me.armor >= 100 && !me.helmet) || (id === 'helmet' && me.helmet && me.armor >= 100) || (w.slot === 'nade' && G.inv[id] >= (id === 'flash' ? 2 : 1));
     const skin = PROF.data?.equipped?.[id] || '', url = gear ? null : thumbURL(id, skin), cls = own ? ' own' : pr > money ? ' no' : '';
-    const pic = gear ? `<div class="bmico">${GEAR_ICON[id]}</div>` : url ? `<img src="${url}" alt="">` : `<img data-th="${id}:${skin}" alt="">`;
+    const pic = gear ? `<div class="bmico">${GEAR_ICON[id]}</div>` : url ? ('<img src="' + url + '" alt="">') : `<img data-th="${id}:${skin}" alt="">`;
     return `<div class="bmc${cls}${gear ? ' gear' : ''}" data-buy="${id}"><span class="bmp">${free ? 'GRÁTIS' : '$' + pr}</span>${pic}<b>${esc(w.name)}</b>${own ? '<i>COMPRADO</i>' : ''}</div>`;
   };
   const cols = BUY_COLS.map(col => `<div class="bmcol">${col.map(([t, ids]) => `<div class="bmcat">${t}</div>${ids.filter(id => W[id] && !(C.st?.mode === 'rounds' && TEAMW[id] && TEAMW[id] !== C.players.get(C.myId)?.tm)).map(id => card(id)).join('')}`).join('')}</div>`).join('');
@@ -26429,7 +26429,7 @@ function skinsUI() {
   if (grid) {
     setHTMLm('vGrid', vCategories().map(col => `<div class="vcol">${col.map(([cat, ws]) => `<div class="vcat">${cat}</div>` + ws.map(w => {
       const n = items.filter(it => it.startsWith(w + ':')).length, f = d.equipped[w] || '', rar = f ? SKIN_BY[f].r : -1, url = thumbURL(w, f);
-      return `<div class="vtile" data-w="${w}" style="--rc:${rar >= 0 ? RARITY[rar].css : 'transparent'}">${url ? `<img src="${url}" alt="">` : `<img data-th="${w}:${f}" alt="">`}<b>${esc(itemInfo(w + ':x').wn)}</b>${isKnife(w) && knifeInUse() === w ? `<i style="color:var(--acc)">em uso${f ? ' · ' + esc(SKIN_BY[f].name) : ''}</i>` : f ? `<i>${esc(SKIN_BY[f].name)}</i>` : ''}${n ? `<span>${n}</span>` : ''}</div>`;
+      return `<div class="vtile" data-w="${w}" style="--rc:${rar >= 0 ? RARITY[rar].css : 'transparent'}">${url ? ('<img src="' + url + '" alt="">') : `<img data-th="${w}:${f}" alt="">`}<b>${esc(itemInfo(w + ':x').wn)}</b>${isKnife(w) && knifeInUse() === w ? `<i style="color:var(--acc)">em uso${f ? ' · ' + esc(SKIN_BY[f].name) : ''}</i>` : f ? `<i>${esc(SKIN_BY[f].name)}</i>` : ''}${n ? `<span>${n}</span>` : ''}</div>`;
     }).join('')).join('')}</div>`).join(''));
     pvShow(null);
     return;
