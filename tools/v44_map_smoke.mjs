@@ -205,6 +205,29 @@ try {
     assert(result.sites.A.plantableSamples>0 && result.sites.B.plantableSamples>0,'site lacks planting space '+id);
     assert.equal(result.spawnData.t.length,5,'incorrect T spawns '+id);
     assert.equal(result.spawnData.ct.length,5,'incorrect CT spawns '+id);
+    assert.equal(result.components.length,1,'isolated bot navigation islands '+id);
+    assert.equal(result.clearSightlines,0,'enemy spawns have direct line-of-sight '+id);
+    for(const team of ['t','ct']){
+      assert(result.spawnData[team].every(sp=>sp.free),'blocked spawn '+id+' '+team);
+      assert(result.spawnData[team].every(sp=>sp.toSite.A && sp.toSite.B),'unreachable bombsite '+id+' '+team);
+      for(let i=0;i<result.spawnData[team].length;i++)
+        for(let j=i+1;j<result.spawnData[team].length;j++){
+          const a=result.spawnData[team][i].point,b=result.spawnData[team][j].point;
+          assert(Math.hypot(a[0]-b[0],a[1]-b[1])>=1.5,'overlapping teammates at spawn '+id);
+        }
+    }
+    for(const site of ['A','B']){
+      assert(result.closest[site].ct < result.closest[site].t,
+        'defenders must be able to reach '+id+' '+site+' before attackers');
+      if(result.closest[site].t-result.closest[site].ct>20)
+        console.log('V44 BALANCE REVIEW:',id,site,'CT lead',Math.round((result.closest[site].t-result.closest[site].ct)*10)/10,'meters');
+    }
+    if(id==='frostline'){
+      assert(result.closest.A.ct<=63 && result.closest.B.ct<=62,'Frostline CT spawn balance regressed');
+    }
+    if(id==='kairo'){
+      assert(result.closest.A.ct<=62 && result.closest.B.ct<=60,'Kairo CT spawn balance regressed');
+    }
   }
   const unreachableProof=await page.evaluate(()=>window.__strykeV44.isolatedNavigation());
   assert.deepEqual(unreachableProof.disconnected,[], 'disconnected bot path must not return a straight line through walls');
