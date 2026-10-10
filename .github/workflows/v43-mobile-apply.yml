@@ -1,0 +1,74 @@
+name: Apply STRYKE V43 Mobile Fixes
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/v43-mobile-apply.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch only mobile interactions
+        run: python3 tools/apply_v43_mobile.py
+
+      - name: Validate changes and inline scripts
+        shell: bash
+        run: |
+          git diff --check
+          test "$(git diff --name-only)" = "index.html"
+          grep -q "V43 MOBILE INTERACTION FIXES" index.html
+          grep -q "function mobileUseStart()" index.html
+          grep -q "function mobileUseEnd()" index.html
+          grep -q 'id="mPause"' index.html
+          grep -q 'id="mCloseBuy"' index.html
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import subprocess, sys
+
+          class InlineScripts(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.capturing = False
+                  self.parts = []
+                  self.scripts = []
+              def handle_starttag(self, tag, attrs):
+                  if tag == 'script':
+                      a = dict(attrs)
+                      self.capturing = 'src' not in a and a.get('type', '').lower() in ('', 'module', 'text/javascript')
+                      self.parts = []
+              def handle_data(self, data):
+                  if self.capturing: self.parts.append(data)
+              def handle_endtag(self, tag):
+                  if tag == 'script':
+                      if self.capturing:
+                          self.scripts.append(''.join(self.parts))
+                      self.capturing = False
+          doc = Path('index.html').read_text(encoding='utf-8')
+          parser = InlineScripts()
+          parser.feed(doc)
+          if not parser.scripts: sys.exit('No inline scripts to validate')
+          for index, source in enumerate(parser.scripts, 1):
+              r = subprocess.run(['node', '--check', '--input-type=module'], input=source, text=True, capture_output=True)
+              if r.returncode: sys.exit(f'Script {index} failed: {r.stderr}')
+          print(f'Validated {len(parser.scripts)} inline scripts')
+          PY
+
+      - name: Commit verified V43 mobile fix
+        run: |
+          git config user.name "STRYKE Build Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "STRYKE V43 mobile hold controls and overlay fixes"
+          git push
