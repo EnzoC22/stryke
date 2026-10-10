@@ -10,7 +10,7 @@ const browser = await chromium.launch({
 function withHooks(html) {
   const needle = /<\/script>\s*<\/body>/i;
   if (!needle.test(html)) throw Error('Could not find final inline module');
-  const hooks = \`
+  const hooks = `
     // V44 read-only map probes: injected into test response, not shipped.
     window.__strykeV44 = {
       inspect: (id) => {
@@ -80,7 +80,7 @@ function withHooks(html) {
           spawnData,sites,closest,clearSightlines, collisionBoxes:COL.length};
       }
     };
-  \`;
+  `;
   return html.replace(needle, hooks + '\n$&');
 }
 
