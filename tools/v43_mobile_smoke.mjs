@@ -51,9 +51,18 @@ function withHooks(html) {
 
 async function boot(page, label) {
   const errors = [];
+  await page.addInitScript(() => {
+    window.addEventListener('error', event => {
+      const element = event.target;
+      if (element?.tagName === 'IMG' && element.src?.includes('%7Burl%7D')) {
+        console.warn('BROKEN_IMG:', element.outerHTML.slice(0, 450),
+          'PARENT:', element.parentElement?.outerHTML.slice(0, 600));
+      }
+    }, true);
+  });
   page.on('pageerror', error => errors.push(error.message.slice(0, 350)));
   page.on('console', message => {
-    if (message.type() === 'error') console.log(label, 'console error:', message.text().slice(0, 200));
+    if (message.type() === 'error' || message.text().startsWith('BROKEN_IMG:')) console.log(label, 'console diagnostic:', message.text().slice(0, 1400));
   });
   page.on('response', response => {
     if (response.status() === 404) console.log(label, 'missing resource:', response.url());
