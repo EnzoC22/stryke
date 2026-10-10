@@ -22,6 +22,9 @@ function withHooks(html) {
       C.eTip = true;
       ZC.on = false;
       $('#pause')?.classList.add('hidden');
+      $('#menu')?.classList.add('hidden');
+      $('#hud')?.classList.remove('hidden');
+      $('#click')?.classList.add('hidden');
       mobileGameOn();
       return true;
     },
@@ -51,6 +54,9 @@ async function boot(page, label) {
   page.on('pageerror', error => errors.push(error.message.slice(0, 350)));
   page.on('console', message => {
     if (message.type() === 'error') console.log(label, 'console error:', message.text().slice(0, 200));
+  });
+  page.on('response', response => {
+    if (response.status() === 404) console.log(label, 'missing resource:', response.url());
   });
   const response = await page.goto(base, {waitUntil: 'domcontentloaded', timeout: 60000});
   assert.equal(response.status(), 200, label + ' HTML returned non-200 status');
