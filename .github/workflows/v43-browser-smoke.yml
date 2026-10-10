@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/v43-browser-smoke.yml
       - tools/v43_mobile_smoke.mjs
+      - index.html
   workflow_dispatch:
 
 permissions:
