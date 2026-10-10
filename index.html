@@ -682,6 +682,30 @@ button.big:after{content:"";position:absolute;inset:0;background:linear-gradient
 @media(pointer:coarse) and (orientation:portrait){body.mobile-game #rotateMobile{display:flex!important}}
 @media(pointer:coarse) and (orientation:landscape){#mobileControls:not(.hidden){display:block!important}#top{transform:scale(.88);transform-origin:top center}#mmap{width:128px!important;height:128px!important}#hp,#ammo{transform:scale(.82);transform-origin:bottom left}#ammo{transform-origin:bottom right}#feed{transform:scale(.85);transform-origin:top right}}
 
+
+/* V43 MOBILE INTERACTION FIXES */
+.mact.pause{right:4vw;top:14vh;width:62px;height:42px;border-radius:12px;font-size:10px}
+#mCloseBuy{display:none}
+body.mobile-game #buy:not(.hidden){
+  position:fixed;inset:0;z-index:100!important;
+  pointer-events:auto!important;touch-action:pan-y;
+}
+body.mobile-game #buy:not(.hidden) .bmwrap{
+  touch-action:pan-y;overscroll-behavior:contain;
+}
+body.mobile-game #mCloseBuy{
+  display:block;position:fixed;right:16px;top:12px;z-index:102;
+  border:1px solid rgba(255,255,255,.35);
+  border-radius:10px;background:#df354a;color:white;padding:10px 14px;
+  font:800 12px Inter,sans-serif;touch-action:manipulation;
+}
+body.mobile-game:has(#buy:not(.hidden)) #mobileControls,
+body.mobile-game:has(#pause:not(.hidden)) #mobileControls{
+  visibility:hidden;pointer-events:none;
+}
+body.mobile-game:has(#buy:not(.hidden)) #rotateMobile,
+body.mobile-game:has(#pause:not(.hidden)) #rotateMobile{display:none!important}
+
 </style>
 <!-- Bibliotecas servidas do próprio repositório (vendor/: mesmas versões e bytes das CDNs, hashes em vendor/HASHES.md): uma CDN comprometida
      não troca o código do jogo. Exceção: index.html aberto direto do disco (file://), onde o navegador bloqueia módulos ES locais (CORS);
@@ -790,6 +814,7 @@ input[type=range]{accent-color:var(--v5-red)}
   <button id="mBuy" class="mact buy" aria-label="Loja">LOJA</button>
   <button id="mSwap" class="mact swap" aria-label="Trocar arma">↻</button>
   <button id="mBoard" class="mact board" aria-label="Placar">PLACAR</button>
+  <button id="mPause" class="mact pause" aria-label="Pausar jogo">PAUSA</button>
 </div>
 <div id="rotateMobile" class="hidden"><b>GIRE O CELULAR</b><span>STRYKE foi otimizado para jogar na horizontal.</span></div>
 
@@ -927,7 +952,7 @@ input[type=range]{accent-color:var(--v5-red)}
   </div>
 </div>
 
-<div class="stryke-build">STRYKE <b>4.6 // V42 MODE SELECT + MOBILE</b></div>
+<div class="stryke-build">STRYKE <b>4.7 // V43 MOBILE FIXES</b></div>
 
 <div id="pause" class="overlay hidden">
   <div class="panel wide">
@@ -18694,7 +18719,7 @@ const G = { cur: 'knife', last: 'knife', nextFire: 0, reloadEnd: 0, reloadStart:
 const C = { myId: null, st: null, phase: 'warmup', timeLeft: 0, round: 0, players: new Map(), spec: null, deadAt: 0, killer: null, buyOpen: false, buyCat: -1, chatOpen: false, winner: null, pre: 0, showBoard: false };
 const R = new Map(); // jogadores remotos
 const nades = [], smokes = [];
-const MOBILE = matchMedia('(pointer:coarse)').matches || navigator.maxTouchPoints > 0;
+const MOBILE = matchMedia('(pointer:coarse)').matches;
 const MOB = { fw:0, st:0, crouch:false, lookId:null, joyId:null, lx:0, ly:0 };
 const locked = () => MOBILE || document.pointerLockElement === canvas;
 if (MOBILE && !load('mobileOptimized', false)) {
@@ -25587,12 +25612,13 @@ function renderBuy() {
     return `<div class="bmc${cls}${gear ? ' gear' : ''}" data-buy="${id}"><span class="bmp">${free ? 'GRÁTIS' : '$' + pr}</span>${pic}<b>${esc(w.name)}</b>${own ? '<i>COMPRADO</i>' : ''}</div>`;
   };
   const cols = BUY_COLS.map(col => `<div class="bmcol">${col.map(([t, ids]) => `<div class="bmcat">${t}</div>${ids.filter(id => W[id] && !(C.st?.mode === 'rounds' && TEAMW[id] && TEAMW[id] !== C.players.get(C.myId)?.tm)).map(id => card(id)).join('')}`).join('')}</div>`).join('');
-  setHTML('buy', `<div class="bmwrap"><div class="bmtop"><div><div class="bmt">LOJA</div><div class="bmh">Clique para comprar · <b>B</b> ou <b>Esc</b> fecha</div></div><div class="bmcred"><span>DINHEIRO</span>${free ? 'GRÁTIS' : '$' + money}</div></div>
+  setHTML('buy', `<button type="button" id="mCloseBuy" aria-label="Fechar loja">FECHAR ×</button><div class="bmwrap"><div class="bmtop"><div><div class="bmt">LOJA</div><div class="bmh">Clique para comprar · <b>B</b> ou <b>Esc</b> fecha</div></div><div class="bmcred"><span>DINHEIRO</span>${free ? 'GRÁTIS' : '$' + money}</div></div>
     <div class="bmgrid">${cols}</div><div class="bmcat">Equipamento</div><div class="bmgear">${BUY_GEAR.filter(id => (id !== 'kit' || (C.st?.mode === 'rounds' && C.players.get(C.myId)?.tm === 'ct')) && !(C.st?.mode === 'rounds' && TEAMW[id] && TEAMW[id] !== C.players.get(C.myId)?.tm)).map(id => card(id, true)).join('')}</div></div>`);
 }
 function openBuy() { if (!me.alive || ZC.on) return; C.buyOpen = true; hudCache.buy = null; renderBuy(); document.exitPointerLock?.(); }
 function closeBuy() { C.buyOpen = false; renderBuy(); requestLock(); }
 $('#buy').addEventListener('click', e => {
+  if (e.target.closest('#mCloseBuy')) { closeBuy(); return; }
   const c = e.target.closest('[data-buy]'); if (!c) return;
   if (c.classList.contains('no')) { play('empty'); return; }
   sendToHost({ t: 'buy', it: c.dataset.buy }); play('buy');
@@ -25646,7 +25672,7 @@ addEventListener('keydown', e => {
   }
 });
 addEventListener('keyup', e => { keys[e.code] = false; if (e.code === 'KeyT') sprayRelease(); if (e.code === 'Tab') C.showBoard = false; if (e.code === 'KeyE' && C.st?.mode === 'rounds') sendToHost({ t: 'bomb', on: 0 }); });
-function releaseInput() { for (const k in keys) keys[k] = false; if (typeof MOB!=='undefined') { MOB.fw=MOB.st=0; } mouseDown = false; G.adsHold = false; C.showBoard = false; sprayCancel(); }
+function releaseInput() { if (MOBILE && keys.KeyE) mobileUseEnd(); for (const k in keys) keys[k] = false; if (typeof MOB!=='undefined') { MOB.fw=MOB.st=0; } mouseDown = false; G.adsHold = false; C.showBoard = false; sprayCancel(); }
 addEventListener('blur', releaseInput);
 // Tecla presa: se o navegador engoliu o "soltar" (o aviso "Sair do site?" do Ctrl+W congela a página e as teclas
 // soltas nesse meio-tempo nunca chegam), o próximo evento com o estado real dos modificadores corrige.
@@ -25690,17 +25716,38 @@ function closeChat() { C.chatOpen = false; const i = $('#chatin'); i.blur(); i.c
 // ---------- V42 mobile controls ----------
 function mobileGameOn(){
   if(!MOBILE) return;
+  $('#pause')?.classList.add('hidden');
   $('#mobileControls')?.classList.remove('hidden');
   $('#click')?.classList.add('hidden');
   document.body.classList.add('mobile-game');
   try { screen.orientation?.lock?.('landscape').catch(()=>{}); } catch(e) {}
 }
 function mobileGameOff(){
+  if (MOBILE) mobileUseEnd();
   $('#mobileControls')?.classList.add('hidden');
   document.body.classList.remove('mobile-game');
   MOB.fw=MOB.st=0; MOB.crouch=false; mouseDown=false; G.adsHold=false;
 }
 function mobileTapKey(code,ms=90){ keys[code]=true; setTimeout(()=>keys[code]=false,ms); }
+
+function mobileUseStart(){
+  if (!inGame || !me.alive || C.buyOpen || !$('#pause')?.classList.contains('hidden')) return;
+  if (ZC.on) {
+    keys.KeyF = true;
+    zUse(); // short presses still buy/open/use zombie objects
+  } else {
+    keys.KeyE = true; // the existing bomb loop performs the hold protocol
+    mapInteract();   // the existing non-zombie F action
+    if (!C.eTip) sendToHost({ t: 'pick' }); // E pickup when not planting/defusing
+  }
+}
+function mobileUseEnd(){
+  const hadBombHold = !!keys.KeyE;
+  keys.KeyE = false;
+  keys.KeyF = false;
+  if (hadBombHold && C.st?.mode === 'rounds')
+    sendToHost({ t: 'bomb', on: 0 }); // mirror desktop KeyE keyup
+}
 function mobileBind(){
   if(!MOBILE) return;
   const joy=$('#mJoy'), stick=joy?.querySelector('i'), look=$('#mLook');
@@ -25729,14 +25776,16 @@ function mobileBind(){
     q?.addEventListener('pointerdown',e=>{e.preventDefault();q.setPointerCapture?.(e.pointerId);on();});
     q?.addEventListener('pointerup',e=>{e.preventDefault();off?.();});
     q?.addEventListener('pointercancel',()=>off?.());
+    q?.addEventListener('lostpointercapture',()=>off?.());
   };
   hold('#mFire',()=>{if(!me.alive){cycleSpec();return;}mouseDown=true;G.trigger=true;},()=>mouseDown=false);
   hold('#mAim',()=>{const w=W[G.cur];if(w&&!w.scope&&(w.slot==='primary'||w.slot==='secondary'))G.adsHold=true;else altFire();},()=>G.adsHold=false);
   $('#mJump')?.addEventListener('pointerdown',e=>{e.preventDefault();mobileTapKey('Space',120);});
   $('#mCrouch')?.addEventListener('pointerdown',e=>{e.preventDefault();MOB.crouch=!MOB.crouch;e.currentTarget.classList.toggle('on',MOB.crouch);});
   $('#mReload')?.addEventListener('pointerdown',e=>{e.preventDefault();startReload();});
-  $('#mUse')?.addEventListener('pointerdown',e=>{e.preventDefault();if(ZC.on)zUse();else mapInteract();});
-  $('#mBuy')?.addEventListener('pointerdown',e=>{e.preventDefault();C.buyOpen?closeBuy():openBuy();});
+  hold('#mUse', mobileUseStart, mobileUseEnd);
+  $('#mBuy')?.addEventListener('pointerdown',e=>{e.preventDefault();mobileUseEnd();C.buyOpen?closeBuy():openBuy();});
+  $('#mPause')?.addEventListener('pointerdown',e=>{e.preventDefault();if(!inGame||C.buyOpen)return;releaseInput();showPause();});
   $('#mSwap')?.addEventListener('pointerdown',e=>{e.preventDefault();cycleWeapon(1);});
   hold('#mBoard',()=>C.showBoard=true,()=>C.showBoard=false);
 }
