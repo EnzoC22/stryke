@@ -1,0 +1,59 @@
+name: STRYKE V44 Navigation Safety Apply
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/v44-nav-apply.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply guarded unreachable navigation fallback fix
+        run: python3 tools/apply_v44_nav_safety.py
+      - name: Check navigation behavior, script syntax and diff scope
+        shell: bash
+        run: |
+          git diff --check
+          test "$(git diff --name-only)" = "index.html"
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import re, subprocess, sys
+          s=Path('index.html').read_text(encoding='utf-8')
+          nav=s[s.index('function navPath(ax, az, bx, bz) {'):s.index('// ================================================================',s.index('function navPath(ax, az, bx, bz) {'))]
+          assert nav.count('return [];') >= 3
+          assert 'return [[bx, bz]];' not in nav
+          class Parser(HTMLParser):
+              def __init__(self): super().__init__(); self.active=False; self.parts=[]; self.scripts=[]
+              def handle_starttag(self,tag,attrs):
+                  if tag=='script':
+                      a=dict(attrs); self.active='src' not in a and a.get('type','').lower() in ('','text/javascript','module'); self.parts=[]
+              def handle_data(self,data):
+                  if self.active:self.parts.append(data)
+              def handle_endtag(self,tag):
+                  if tag=='script':
+                      if self.active:self.scripts.append(''.join(self.parts))
+                      self.active=False
+          p=Parser();p.feed(s)
+          assert p.scripts,'missing scripts'
+          for i,script in enumerate(p.scripts,1):
+              r=subprocess.run(['node','--check','--input-type=module'],input=script,text=True,capture_output=True)
+              if r.returncode:sys.exit('Script '+str(i)+' failed: '+r.stderr)
+          print('PASS navPath guarded return [] and',len(p.scripts),'inline scripts')
+          PY
+      - name: Commit only verified navigation fix
+        run: |
+          git config user.name "STRYKE Build Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "STRYKE V44 prevent bots taking straight paths through disconnected navmesh"
+          git push
