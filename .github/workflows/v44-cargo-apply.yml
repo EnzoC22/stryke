@@ -1,0 +1,58 @@
+name: STRYKE V44 Cargo Balance Apply
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/v44-cargo-apply.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply prevalidated Cargo attacker spawn adjustment
+        run: python3 tools/apply_v44_cargo_balance.py
+      - name: Check no geometry or asset replacements
+        run: |
+          git diff --check
+          test "$(git diff --name-only)" = "index.html"
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import subprocess
+          s=Path('index.html').read_text(encoding='utf-8')
+          assert s.count('/* V44 CARGO SPAWN ROUTE BALANCE */')==1
+          assert 'MAPS.cargo.spawns.splice(0, 5, [-8,13], [-5,13], [-2,13], [1,13], [4,13]);' in s
+          assert '4.8 // V44 COMPETITIVE FOUNDATION' in s
+          class Scripts(HTMLParser):
+              def __init__(self):super().__init__();self.active=False;self.parts=[];self.scripts=[]
+              def handle_starttag(self,tag,attrs):
+                  if tag=='script':
+                      a=dict(attrs);self.active='src' not in a and a.get('type','').lower() in ('','module','text/javascript');self.parts=[]
+              def handle_data(self,data):
+                  if self.active:self.parts.append(data)
+              def handle_endtag(self,tag):
+                  if tag=='script':
+                      if self.active:self.scripts.append(''.join(self.parts))
+                      self.active=False
+          p=Scripts();p.feed(s)
+          assert p.scripts
+          for i,script in enumerate(p.scripts,1):
+              r=subprocess.run(['node','--check','--input-type=module'],input=script,text=True,capture_output=True)
+              if r.returncode:raise SystemExit(f'Script {i}: {r.stderr}')
+          print('PASS Cargo V44 syntax:',len(p.scripts),'script blocks')
+          PY
+      - name: Commit only Cargo spawn balance
+        run: |
+          git config user.name "STRYKE Build Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "STRYKE V44 balance Cargo attack spawn routes and update version"
+          git push
