@@ -17175,13 +17175,13 @@ function nearestNode(x, z) {
   return best;
 }
 function navPath(ax, az, bx, bz) {
-  if (!NAV || !NAV.nodes.length) return [[bx, bz]];
+  if (!NAV || !NAV.nodes.length) return [];
   const s = nearestNode(ax, az), g = nearestNode(bx, bz);
-  if (s < 0 || g < 0) return [[bx, bz]];
+  if (s < 0 || g < 0) return [];
   const prev = new Int32Array(NAV.nodes.length).fill(-2); prev[s] = -1;
   const q = [s];
   for (let qi = 0; qi < q.length; qi++) { const c = q[qi]; if (c === g) break; for (const n of NAV.nodes[c].n) if (prev[n] === -2) { prev[n] = c; q.push(n); } }
-  if (prev[g] === -2) return [[bx, bz]];
+  if (prev[g] === -2) return [];
   const path = []; for (let c = g; c !== -1; c = prev[c]) path.push([NAV.nodes[c].x, NAV.nodes[c].z]);
   path.reverse();
   // corta caminho: pula nós enquanto houver linha livre
