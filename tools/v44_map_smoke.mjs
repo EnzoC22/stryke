@@ -158,6 +158,7 @@ try {
       blockedSpawns:Object.fromEntries(['t','ct'].map(t=>[t,result.spawnData[t].filter(s=>!s.free).map(s=>s.point)])),
       unreachable:Object.fromEntries(['t','ct'].map(t=>[t,result.spawnData[t].flatMap(s=>['A','B'].filter(k=>!s.toSite[k]).map(k=>[s.point,k]))])),
       sightlines:result.clearSightlines,
+      spawnRoutes:Object.fromEntries(['t','ct'].map(t=>[t,result.spawnData[t].map(v=>({p:v.point,a:v.toSite.A?.distance,b:v.toSite.B?.distance}))])),
       closest:result.closest,
       sites:Object.fromEntries(['A','B'].map(k=>[k,{plantableSamples:result.sites[k].plantableSamples,point:result.sites[k].point}]))
     };
