@@ -24,6 +24,53 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Validate inline JavaScript before publishing
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import subprocess
+          import sys
+
+          class Scripts(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.active = False
+                  self.parts = []
+                  self.scripts = []
+              def handle_starttag(self, tag, attrs):
+                  if tag == "script":
+                      attrs = dict(attrs)
+                      self.active = "src" not in attrs and attrs.get("type", "").lower() in ("", "text/javascript", "module")
+                      self.parts = []
+              def handle_data(self, data):
+                  if self.active:
+                      self.parts.append(data)
+              def handle_endtag(self, tag):
+                  if tag == "script":
+                      if self.active:
+                          self.scripts.append("".join(self.parts))
+                      self.active = False
+
+          html = Path("index.html")
+          if not html.is_file():
+              sys.exit("Missing index.html")
+          parser = Scripts()
+          parser.feed(html.read_text(encoding="utf-8"))
+          if not parser.scripts:
+              sys.exit("No inline JavaScript found")
+          for i, script in enumerate(parser.scripts, 1):
+              result = subprocess.run(
+                  ["node", "--check", "--input-type=module"],
+                  input=script, text=True, capture_output=True
+              )
+              if result.returncode:
+                  print(f"Inline script {i} failed syntax validation:\\n{result.stderr}")
+                  sys.exit(result.returncode)
+          print(f"Validated {len(parser.scripts)} inline scripts")
+          PY
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
