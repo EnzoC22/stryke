@@ -952,7 +952,7 @@ input[type=range]{accent-color:var(--v5-red)}
   </div>
 </div>
 
-<div class="stryke-build">STRYKE <b>4.7 // V43 MOBILE FIXES</b></div>
+<div class="stryke-build">STRYKE <b>4.8 // V44 COMPETITIVE FOUNDATION</b></div>
 
 <div id="pause" class="overlay hidden">
   <div class="panel wide">
@@ -17025,6 +17025,15 @@ if (MAPS.frostline?.spawnsB?.length === 5 && MAPS.kairo?.spawnsB?.length === 5) 
   MAPS.kairo.spawnsB[0] = [10, -28];
 } else {
   console.warn('[STRYKE V44] Balanced spawns not applied: map structure changed');
+}
+
+/* V44 CARGO SPAWN ROUTE BALANCE */
+// Based on Chromium collision, line-of-sight, barrier and nav tests.
+// Keeps five distinct attacker spawns and all structural map geometry.
+if (MAPS.cargo?.spawns?.length === 5) {
+  MAPS.cargo.spawns.splice(0, 5, [-8,13], [-5,13], [-2,13], [1,13], [4,13]);
+} else {
+  console.warn('[STRYKE V44] Cargo spawn balance skipped: map structure changed');
 }
 
 function buildMap(id) {
