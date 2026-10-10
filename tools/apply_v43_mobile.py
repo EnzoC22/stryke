@@ -116,7 +116,7 @@ body.mobile-game:has(#pause:not(.hidden)) #mobileControls{
 body.mobile-game:has(#buy:not(.hidden)) #rotateMobile,
 body.mobile-game:has(#pause:not(.hidden)) #rotateMobile{display:none!important}
 """
-patch("</style>", css + "\n</style>", "mobile overlay layer safety")
+if "</style>" not in s:\n    raise SystemExit("V43 patch stopped: no closing style tag")\ns = s.replace("</style>", css + "\n</style>", 1)\nprint("PATCH mobile overlay layer safety")
 patch("STRYKE <b>4.6 // V42 MODE SELECT + MOBILE</b>",
       "STRYKE <b>4.7 // V43 MOBILE FIXES</b>",
       "version chip")
