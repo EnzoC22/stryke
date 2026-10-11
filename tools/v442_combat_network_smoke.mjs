@@ -341,12 +341,12 @@ try {
 
   await guest.evaluate(()=>window.__v441.emit({t:'bomb',on:1}));
   await guest.waitForTimeout(400);
-  assert.equal((await host.evaluate(()=>window.__v441.snapCombat())).bomb.st,'carried',
+  assert.equal((await host.evaluate(()=>window.__v441.snapshot())).bombState,'carried',
     'CT must not be allowed to plant bomb');
   console.log('PASS bomb anti-cheat: defender cannot plant attacker bomb');
 
   await host.evaluate(()=>window.__v441.hostEmit({t:'bomb',on:1}));
-  await until(host,()=>window.__v441.snapCombat().bomb?.st==='planted',
+  await until(host,()=>window.__v441.snapshot().bombState==='planted',
     'actual planting duration',12000);
   await until(guest,()=>window.__v441.snapshot().bombState==='planted',
     'plant replication',12000);
@@ -360,12 +360,12 @@ try {
   await guest.evaluate(()=>window.__v441.emit({t:'bomb',on:0}));
   await until(host,()=>window.__v441.snapCombat().players.some(p=>p.id==='p1'&&!p.act),
     'remote defuse cancelled',6000);
-  assert.equal((await host.evaluate(()=>window.__v441.snapCombat())).bomb.st,'planted',
+  assert.equal((await host.evaluate(()=>window.__v441.snapshot())).bombState,'planted',
     'releasing E should not defuse the bomb');
   console.log('PASS bomb: releasing use cancels defuse before completion');
 
   await guest.evaluate(()=>window.__v441.emit({t:'bomb',on:1}));
-  await until(host,()=>window.__v441.snapCombat().bomb?.st==='defused',
+  await until(host,()=>window.__v441.snapshot().bombState==='defused',
     'remote defuse completes',22000);
   await until(guest,()=>window.__v441.snapCombat().phase==='end' &&
     window.__v441.snapCombat().score?.ct===1,'defuse victory replication',13000);
@@ -388,15 +388,15 @@ try {
   assert.equal(raceStage.attacker,'p1','half-time must make remote guest attacker');
   assert.equal(raceStage.defender,'h','half-time must make host defender');
   await guest.evaluate(()=>window.__v441.emit({t:'bomb',on:1}));
-  await until(host,()=>window.__v441.snapCombat().bomb?.st==='planted',
+  await until(host,()=>window.__v441.snapshot().bombState==='planted',
     'remote attacker plants over WebRTC',12000);
   console.log('PASS bomb: remote attacker plants through genuine WebRTC packet');
   await host.evaluate(()=>window.__v441.hostEmit({t:'bomb',on:1}));
   await until(host,()=>window.__v441.snapCombat().players.some(p=>p.id==='h'&&p.act==='d'),
     'host defender begins defuse',8000);
   await host.evaluate(()=>window.__v441.expireDuringDefuse());
-  const raceResult=await host.evaluate(()=>window.__v441.snapCombat());
-  assert.equal(raceResult.bomb?.st,'exploded',
+  const raceResult=await host.evaluate(()=>window.__v441.snapshot());
+  assert.equal(raceResult.bombState,'exploded',
     'expired bomb must explode instead of granting late defuse on the same tick');
   await until(guest,()=>window.__v441.snapshot().bombState==='exploded',
     'simultaneous bomb deadline replicated',12000);
