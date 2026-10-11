@@ -1,4 +1,5 @@
 name: V45 Map and Spawn Validation
+# Validate the completed flank-corridor and canonical spawn update
 on:
   push:
     branches: [v45-map-spawns-and-routes-overhaul]
