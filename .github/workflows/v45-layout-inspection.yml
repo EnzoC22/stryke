@@ -1,0 +1,18 @@
+name: V45 Layout Inspection
+
+on:
+  push:
+    branches: [v45-map-spawns-and-routes-overhaul]
+    paths:
+      - tools/v45_layout_inspection.py
+      - .github/workflows/v45-layout-inspection.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/v45_layout_inspection.py
