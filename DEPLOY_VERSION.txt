@@ -1,2 +1,2 @@
-STRYKE 4.8 // V44 COMPETITIVE FOUNDATION
-Validated game revision: cc60ccf10268650ce456e11a0ebb0179bafec480
+STRYKE 4.9 // V45 TACTICAL MAPS
+Validated game revision: 9d88b42984bffa4fcf4fbf2a2debe68777f64afa
