@@ -77,6 +77,10 @@ function instrument(html) {
         S.drops?.clear();
         this.current = null;
         this.withRng(() => {
+          // A new round is an independent benchmark scenario: reset physical
+          // world, collision caches, navigation and all interactive map state.
+          // Resetting only S.players leaves renderer/map globals between runs.
+          buildMap(this.map);
           for (let i=0;i<10;i++) {
             const p=srvAddPlayer('bot'+i,'V461 Bot '+i,true);
             setTeam(p,i<5?'t':'ct');
@@ -101,7 +105,8 @@ function instrument(html) {
             lastRepath:p.bot.repathAt,targetChanges:0,lastTarget:null,
             firstEnemySeen:null
           }]))};
-        return {seed,phase:S.phase,players:ps.length};
+        return {seed,phase:S.phase,players:ps.length,
+          starts:ps.map(p=>({id:p.id,team:p.team,position:p.pos,role:p.bot?.role}))};
       },
       advance(ticks) {
         if(!this.current) throw Error('No active round');
