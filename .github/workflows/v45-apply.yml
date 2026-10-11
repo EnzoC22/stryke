@@ -1,4 +1,4 @@
-name: V45 Apply Map Layout Fix
+name: V45 Apply Flank and Spawn Fix
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Apply guarded layout corrections
-        run: python3 tools/apply_v45_map_layout.py
+        run: python3 tools/apply_v45_flanks.py
       - name: Validate all inline Javascript and narrow diff
         run: |
           set -euo pipefail
@@ -55,5 +55,5 @@ jobs:
           git config user.name "STRYKE Build Bot"
           git config user.email "actions@users.noreply.github.com"
           git add index.html
-          git commit -m "V45 restore proper attacker base, rebalance Cargo sites and pre-round gates"
+          git commit -m "V45 open attacker flank corridors and align CT base markings"
           git push
