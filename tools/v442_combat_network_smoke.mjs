@@ -139,7 +139,7 @@ window.__v441 = {
     if(!NET.isHost||S.bomb?.st!=="planted")throw Error("Not a planted bomb");
     const ct=[...S.players.values()].find(p=>p.team==="ct"&&p.act?.k==="d");
     if(!ct)throw Error("No active CT defuse");
-    // Test-only deadlines on the same host tick: explosion must beat late defuse.
+    // Regression V44.2: real host tick must favor expired bomb over late defuse.
     S.bomb.end=now-.25;ct.act.end=now-.2;
     bombTick();srvState();
   },
