@@ -74,6 +74,17 @@ window.__v441 = {
     if(!NET.isHost)throw Error("Not the authoritative host");
     sendToHost(message);
   },
+  sendLaggedChat(){
+    if(NET.isHost||!NET.hostConn?.open)throw Error("No guest connection");
+    const channel=NET.hostConn,original=channel.send.bind(channel);
+    channel.send=(msg)=>{
+      if(msg?.t==="chat"&&msg.txt==="V442 LAG PROBE"){
+        setTimeout(()=>original(msg),450);return;
+      }
+      return original(msg);
+    };
+    sendToHost({t:"chat",txt:"V442 LAG PROBE"});
+  },
   duelSetup(){
     if(!NET.isHost||S.st.mode!=="rounds"||!inGame)throw Error("Host not in rounds");
     const victim=S.players.get("h"),shooter=[...S.players.values()].find(p=>!p.isBot&&p.id!=="h");
@@ -411,16 +422,7 @@ try {
   console.log('PASS objective ordering: bomb expiration beats late defuse on the same tick');
 
   // RTT-resistant message channel: introduce test-only 450ms delay on one chat message.
-  await guest.evaluate(()=>{
-    const channel=NET.hostConn,original=channel.send.bind(channel);
-    channel.send=(msg)=>{
-      if(msg?.t==='chat' && msg.txt==='V442 LAG PROBE'){
-        setTimeout(()=>original(msg),450);return;
-      }
-      return original(msg);
-    };
-    window.__v441.emit({t:'chat',txt:'V442 LAG PROBE'});
-  });
+  await guest.evaluate(()=>window.__v441.sendLaggedChat());
   await until(host,()=>window.__v441.snapshot().chatText.includes('V442 LAG PROBE'),
     'delayed real DataChannel message',10000);
   console.log('PASS network: delayed WebRTC chat delivered without dropping match');
