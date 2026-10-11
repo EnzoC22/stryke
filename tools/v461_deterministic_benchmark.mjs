@@ -28,6 +28,9 @@ function instrument(html) {
   assert.equal(html.split(workerAnchor).length, 2, 'Background frame guard anchor moved');
   html = html.replace(frameAnchor, frameAnchor + '\n  if (window.__strykeV461?.active) return;');
   html = html.replace(workerAnchor, 'tw.onmessage = () => {\n    if (window.__strykeV461?.active) return;\n    if (!inGame');
+  const warmAnchor = '  warmUp(M);';
+  assert.equal(html.split(warmAnchor).length, 2, 'Map shader warming anchor moved');
+  html = html.replace(warmAnchor, '  if (!window.__strykeV461?.active) warmUp(M);');
   const fixture = String.raw`
     // Test-only scope: no production debug hooks, no security-policy changes.
     window.__strykeV461 = {
@@ -44,11 +47,9 @@ function instrument(html) {
       setup(map) {
         if (this.active || NET.isHost || NET.online || inGame) throw Error('Only idle offline fixture supported');
         this.active = true; this.map = map;
-        // Build real collision and navgraph once; rendering is paused for deterministic rounds.
-        buildMap(map);
-        const n = NAV?.nodes?.length || 0;
-        if (n < 20) throw Error('Navigation not initialized');
-        if (!curMap.sites?.A || !curMap.sites?.B) throw Error('Two bombsites required');
+        // No map is built here: a single seeded build per round avoids
+        // asynchronous shader warmup and unseeded prior-world state.
+        if (!MAPS[map]?.sites?.A || !MAPS[map]?.sites?.B) throw Error('Two bombsites required');
         const priorKill = srvKill;
         const probe = this;
         srvKill = function(v, a, w, hs) {
@@ -62,7 +63,7 @@ function instrument(html) {
           }
           return priorKill(v,a,w,hs);
         };
-        return { map, nodes:n, version:'V46.1' };
+        return { map, version:'V46.1' };
       },
       start(seed) {
         if (!this.active || !this.map) throw Error('Setup required');
@@ -81,6 +82,7 @@ function instrument(html) {
         // Otherwise map initialization changes site selection / bot tactics.
         this.state = (seed ^ 0x9e3779b9) >>> 0;
         this.withRng(() => buildMap(this.map));
+        if ((NAV?.nodes?.length||0) < 20) throw Error('Navigation not initialized');
         this.state = seed >>> 0;
         this.withRng(() => {
           for (let i=0;i<10;i++) {
@@ -107,7 +109,7 @@ function instrument(html) {
             lastRepath:p.bot.repathAt,targetChanges:0,lastTarget:null,
             firstEnemySeen:null
           }]))};
-        return {seed,phase:S.phase,players:ps.length,
+        return {seed,phase:S.phase,players:ps.length,navNodes:NAV.nodes.length,
           starts:ps.map(p=>({id:p.id,team:p.team,position:p.pos,role:p.bot?.role}))};
       },
       advance(ticks) {
@@ -197,10 +199,10 @@ try {
       assert.equal(response.status(),200,'Game HTML not reachable');
       await page.locator('#btnHost').waitFor({state:'visible',timeout:70000});
       await page.waitForFunction(()=>!!window.__strykeV461,null,{timeout:45000});
-      const init=await page.evaluate(map=>window.__strykeV461.setup(map),MAP);
-      if(report.navNodes!==undefined) assert.equal(init.nodes,report.navNodes,'Navgraph changed between seeded sessions');
-      report.navNodes=init.nodes;
+      await page.evaluate(map=>window.__strykeV461.setup(map),MAP);
       const started=await page.evaluate(seed=>window.__strykeV461.start(seed),seed);
+      if(report.navNodes!==undefined) assert.equal(started.navNodes,report.navNodes,'Navgraph changed between seeded sessions');
+      report.navNodes=started.navNodes;
     assert.equal(started.phase,'live');
     assert.equal(started.players,10);
     let status={phase:'live'};
