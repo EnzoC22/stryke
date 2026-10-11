@@ -952,7 +952,7 @@ input[type=range]{accent-color:var(--v5-red)}
   </div>
 </div>
 
-<div class="stryke-build">STRYKE <b>4.8 // V44 COMPETITIVE FOUNDATION</b></div>
+<div class="stryke-build">STRYKE <b>4.9 // V45 TACTICAL MAPS</b></div>
 
 <div id="pause" class="overlay hidden">
   <div class="panel wide">
@@ -1794,53 +1794,61 @@ MAPS.vanta=gridMap([
   ]});
 
 MAPS.frostline=gridMap([
-'#####################',
-'##########....CCCCC##',
-'####....##.......####',
-'###.BBB.....#...#####',
-'###.BiB.#####..######',
-'###.BBh.#####..######',
-'####....#####...#####',
-'####...######...#####',
-'#####..#######..#####',
-'#####..#######..#####',
-'##.....#....##.....##',
-'##.h........#....i.##',
-'##.....##....#.....##',
-'####...##.AAAAA.#####',
-'####...##.AAhAA.#####',
-'####..###.AAiAA.#####',
-'##TT..###..##...#####',
-'##TTT.###############',
-'#####################'
+
+
+  '#####################',
+  '##########....CCCCC##',
+  '####....##.......####',
+  '###.BBB.....#...#####',
+  '###.BiB.#####..######',
+  '###.BBh.#####..######',
+  '####....#####...#####',
+  '####...######...#####',
+  '#####..#######..#####',
+  '#####..#######..#####',
+  '##.....#....##.....##',
+  '##.h........#....i.##',
+  '##.....##....#.....##',
+  '####...##.AAAAA.#####',
+  '####...##.AAhAA.#####',
+  '####..###.AAiAA.#####',
+  '##TT..###..##...#####',
+  '##TTT.###############',
+  '#####################',
+
+
 ],4.8,{name:'Frostline // V35 Compact',desc:'V35: base mais claustrofóbica, service lanes fechadas e entradas de site controladas',vibe:'frostline',
   sky:0xaec5d8,skyTop:0x536f8d,fogC:0xaebfca,fog:[74,195],sun:[-22,38,18],hemi:.90,sunI:.64,exposure:.66,
   theme:{floor:['snow',0xdde8ed],wall:['concrete',0xaebbc3],crate:['crate',0x62727e],metal:['metal',0x56636d],stone:['concrete',0x9ba8b0],roof:['metal',0x48545d]},
-  build:v23MapBuild,areasC:[['Base Defesa',7,13,2,6],['Hangar',1,6,7,11],['West Service',4,8,5,13],['Central Lab',7,13,5,13],['Reactor',14,19,7,11],['East Service',12,16,5,13],['Base Ataque',7,13,13,17]]});
+  build:v23MapBuild,areasC:[['Base Defesa',7,13,2,6],['CT Outpost',12,15,3,5],['Hangar',1,6,7,11],['West Service',4,8,5,13],['Central Lab',7,13,5,13],['Reactor',14,19,7,11],['East Service',12,16,5,13],['Base Ataque',7,13,13,17]]});
 v23Extra(MAPS.frostline,[B(-4.8,0,1.0,3.2,3.1,'metal'),B(4.8,0,1.0,3.2,3.1,'metal'),B(-33.6,0,1.2,4.32,3.1,'metal'),B(33.6,0,1.2,4.32,3.1,'metal')]);
 
 // Kairo continua com a planta aprovada da V22, mas recebe o mesmo tratamento de leitura/performance da V23.
 MAPS.kairo=gridMap([
-'#################',
-'#.....###########',
-'#.BBB.##........#',
-'#.BiB......CCCCC#',
-'#.BBh.#####.###.#',
-'###...#####..####',
-'###..####....####',
-'##...####..#.####',
-'##...##.#..######',
-'##.h.......#.####',
-'##..####.AAA.####',
-'#...####.AhA.####',
-'#TT..###.AiA.####',
-'#TTT.####....####',
-'#.........#######',
-'#################'
+
+
+  '#################',
+  '#.....###########',
+  '#.BBB.##........#',
+  '#.BiB......CCCCC#',
+  '#.BBh.#####.###.#',
+  '###...#####..####',
+  '###..####....####',
+  '##...####..#.####',
+  '##...##.#..######',
+  '##.h.......#.####',
+  '##..####.AAA.####',
+  '#...####.AhA.####',
+  '#TT..###.AiA.####',
+  '#TTT.####....####',
+  '#.........#######',
+  '#################',
+
+
 ],6,{name:'Kairo // V35 Compact',desc:'V35: quarteirão denso, Crossroad menor e menos linhas de visão longas',vibe:'kairo',
   sky:0x111a2a,skyTop:0x060910,fogC:0x101722,fog:[78,215],sun:[18,34,-20],hemi:.68,sunI:.34,sunC:0x9fbbe8,exposure:.69,stars:1,
   theme:{floor:['asphalt',0x26323d],wall:['concrete',0x34414d],crate:['crate',0x5b4b47],metal:['metal',0x25313b],stone:['concrete',0x4a5662],roof:['metal',0x1d2730]},
-  build:v23MapBuild,areasC:[['Bomb B / Metro',1,5,1,3],['Flanco Oeste',1,4,4,11],['Rotação Norte',4,14,0,3],['Monólito',5,10,3,5],['Mid / Crossroad',4,10,6,9],['Corredor Leste',10,15,2,9],['Base Defesa',11,13,5,6],['Bomb A / Plaza',7,10,9,11],['Warehouse',10,15,9,13],['Base Ataque',1,5,11,13]]});
+  build:v23MapBuild,areasC:[['Bomb B / Metro',1,5,1,3],['Flanco Oeste',1,4,4,11],['Rotação Norte',4,14,0,3],['Monólito',5,10,3,5],['Mid / Crossroad',4,10,6,9],['Corredor Leste',10,15,2,9],['Base Defesa',10,16,1,5],['Bomb A / Plaza',7,10,9,11],['Warehouse',10,15,9,13],['Base Ataque',1,5,11,13]]});
 v23Extra(MAPS.kairo,[B(-21,30,1.2,6,6,'wall')]);
 
 MAPS.reddune=gridMap([
@@ -2020,19 +2028,19 @@ const PRE_BARRIERS = Object.freeze({
   // two horizontal segments keep T bots distributed between left/right staging lanes.
   vanta:{
     t:[{ax:'z',v:29,a:-60,b:-9,side:'gte'},{ax:'z',v:29,a:-9,b:60,side:'gte'}],
-    ct:[{ax:'z',v:25,a:-60,b:-9,side:'lte'},{ax:'z',v:25,a:-9,b:60,side:'lte'}]
+    ct:[{ax:'z',v:-29,a:-60,b:-9,side:'lte'},{ax:'z',v:-29,a:-9,b:60,side:'lte'}]
   },
   frostline:{
-    t:[{ax:'z',v:34,a:-55,b:-8,side:'gte'},{ax:'z',v:34,a:-8,b:55,side:'gte'}],
-    ct:[{ax:'z',v:30,a:-55,b:-8,side:'lte'},{ax:'z',v:30,a:-8,b:55,side:'lte'}]
+    t:[{ax:'z',v:31,a:-55,b:-8,side:'gte'},{ax:'z',v:31,a:-8,b:55,side:'gte'}],
+    ct:[{ax:'z',v:-21,a:-55,b:18,side:'lte'},{ax:'z',v:-35,a:18,b:55,side:'lte'}]
   },
   kairo:{
-    t:[{ax:'z',v:32,a:-55,b:-8,side:'gte'},{ax:'z',v:32,a:-8,b:55,side:'gte'}],
-    ct:[{ax:'z',v:29,a:-55,b:-8,side:'lte'},{ax:'z',v:29,a:-8,b:55,side:'lte'}]
+    t:[{ax:'z',v:24,a:-55,b:-8,side:'gte'},{ax:'z',v:24,a:-8,b:55,side:'gte'}],
+    ct:[{ax:'z',v:-24,a:-55,b:-8,side:'lte'},{ax:'z',v:-24,a:-8,b:55,side:'lte'}]
   },
   cargo:{
-    t:[{ax:'z',v:12,a:-50,b:0,side:'gte'},{ax:'z',v:12,a:0,b:50,side:'gte'}],
-    ct:[{ax:'z',v:6,a:-50,b:0,side:'lte'},{ax:'z',v:6,a:0,b:50,side:'lte'}]
+    t:[{ax:'z',v:23,a:-50,b:0,side:'gte'},{ax:'z',v:23,a:0,b:50,side:'gte'}],
+    ct:[{ax:'z',v:-23,a:-50,b:0,side:'lte'},{ax:'z',v:-23,a:0,b:50,side:'lte'}]
   }
 });
 const preTeamLocal=()=>C.players.get(C.myId)?.tm||null;
@@ -2315,76 +2323,84 @@ function v36CargoBuild(M){
     areasC:[['B Compound',3,8,2,6],['North Hall',7,17,2,5],['Base Defesa',15,20,2,5],['East Hall',16,20,4,13],['A Rooms',13,19,12,16],['Mid Hall',7,15,9,13],['Hotel',7,11,6,10],['West Route',2,7,9,17],['Base Ataque',2,8,17,19]]});
 
   MAPS.frostline=gridMap([
-'#####################',
-'##########....CCCCC##',
-'####....##.......####',
-'###.BBB.....#...#####',
-'###.BiB.#####..######',
-'###.BBh.#####..######',
-'####....#####...#####',
-'####...######...#####',
-'#####..#######..#####',
-'#####..#######..#####',
-'##..rr.#....##.rr..##',
-'##.hrr......#..rri.##',
-'##..rr.##....#..rr.##',
-'####...##.AAAAA.#####',
-'####...##.AAhAA.#####',
-'####..###.AAiAA.#####',
-'##TT..###..##...#####',
-'##TTT.###############',
-'#####################'
+
+  '#####################',
+  '##########.....CCCC##',
+  '####....##.......####',
+  '###.BBB.....#...#####',
+  '###.BiB.#####C.######',
+  '###.BBh.#####..######',
+  '####....#####...#####',
+  '####...######...#####',
+  '#####..#######..#####',
+  '#####..#######..#####',
+  '##..rr.#....##.rr..##',
+  '##.hrr......#..rri.##',
+  '##..rr.##....#..rr.##',
+  '####...##.AAAAA.#####',
+  '####...##.AAhAA.#####',
+  '####..###.AAiAA.#####',
+  '##TT..###..##...#####',
+  '##TTT.###############',
+  '#####################',
+
 ],4.8,{name:'Frostline // V36 Lab Complex',desc:'warehouse/lab reference: salas ligadas por service corridors e fatal funnels curtos',vibe:'frostline',
     sky:0xaec5d8,skyTop:0x536f8d,fogC:0xaebfca,fog:[74,195],sun:[-22,38,18],hemi:.90,sunI:.64,exposure:.66,
     theme:{floor:['snow',0xdde8ed],wall:['concrete',0xaebbc3],crate:['crate',0x62727e],metal:['metal',0x56636d],stone:['concrete',0x9ba8b0],roof:['metal',0x48545d]},build:v23MapBuild,
-    areasC:[['Base Defesa',10,18,1,4],['Hangar B',3,8,3,6],['West Service',3,8,6,13],['Central Lab',7,13,9,13],['Reactor A',9,17,13,16],['East Service',14,19,7,13],['Covered Hall',3,18,10,12],['Base Ataque',2,7,16,18]]});
+    areasC:[['Base Defesa',10,18,1,4],['CT Outpost',12,15,3,5],['Hangar B',3,8,3,6],['West Service',3,8,6,13],['Central Lab',7,13,9,13],['Reactor A',9,17,13,16],['East Service',14,19,7,13],['Covered Hall',3,18,10,12],['Base Ataque',2,7,16,18]]});
 
   MAPS.kairo=gridMap([
-'#################',
-'#.....###########',
-'#.BBB.##........#',
-'#.BiB......CCCCC#',
-'#.BBh.#####.###.#',
-'###...#####..####',
-'###..####....####',
-'##...####..#.####',
-'##...##r#..######',
-'##.h.rrr...#.####',
-'##..####.AAA.####',
-'#...####.AhA.####',
-'#TT..###.AiA.####',
-'#TTT.####....####',
-'#.........#######',
-'#################'
+
+  '#################',
+  '#.....###########',
+  '#.BBB.##........#',
+  '#.BiB.....C.CCCC#',
+  '#.BBh.#####.###.#',
+  '###...#####..####',
+  '###..####....####',
+  '##...####..#.####',
+  '##...##r#..######',
+  '##.h.rrr...#.####',
+  '##..####.AAA.####',
+  '#...####.AhA.####',
+  '#TT..###.AiA.####',
+  '#TTT.####....####',
+  '#.........#######',
+  '#################',
+
 ],6,{name:'Kairo // V36 Urban Interior',desc:'office/store reference: quarteirão dividido em interiores curtos, lobby central e pockets urbanos',vibe:'kairo',
     sky:0x111a2a,skyTop:0x060910,fogC:0x101722,fog:[78,215],sun:[18,34,-20],hemi:.68,sunI:.34,sunC:0x9fbbe8,exposure:.69,stars:1,
     theme:{floor:['asphalt',0x26323d],wall:['concrete',0x34414d],crate:['crate',0x5b4b47],metal:['metal',0x25313b],stone:['concrete',0x4a5662],roof:['metal',0x1d2730]},build:v23MapBuild,
-    areasC:[['B Metro',1,6,1,5],['North Offices',7,15,1,5],['Base Defesa',11,16,2,5],['Lobby / Mid',4,11,7,10],['Market Rooms',2,8,8,12],['A Plaza',8,13,10,13],['South Entry',1,7,12,15],['Base Ataque',1,5,12,14]]});
+    areasC:[['B Metro',1,6,1,5],['North Offices',7,15,1,5],['Base Defesa',10,16,2,5],['Lobby / Mid',4,11,7,10],['Market Rooms',2,8,8,12],['A Plaza',8,13,10,13],['South Entry',1,7,12,15],['Base Ataque',1,5,12,14]]});
 
   MAPS.cargo=gridMap([
-'#######################',
-'#qquqqquq.....quqqquqq#',
-'#quqqquqqCCCCCuqqquqqq#',
-'#u.h...qq.....qq...h.u#',
-'#q.BBB.quq..uqqq.AAA.q#',
-'#q.BBi...........iAA.q#',
-'#q........h..........q#',
-'#uq..uqqquq.quqqqu..qu#',
-'#qq....q......q.....uq#',
-'#qq.....q.q....q....qq#',
-'#qu.iquqqq..qquqqqi.qq#',
-'#uq..uqqqu.qquqqqu..qu#',
-'#qq....q...h..q.....uq#',
-'#qq.....q......q....qq#',
-'#qu..quqqq..qquqqq..qq#',
-'#uq..uqq.......qqu..qu#',
-'#qqquqqq.TTTTT.quqqquq#',
-'#qquqqqu.......uqqquqq#',
-'#######################'
+
+
+  '#######################',
+  '#qquqqquq.....quqqquqq#',
+  '#quqqquqqCCCCCuqqquqqq#',
+  '#u.h...qq.....qq...h.u#',
+  '#q.....quq..uqqq.....q#',
+  '#q...i...........i...q#',
+  '#q........h..........q#',
+  '#uq..uqqquq.quqqqu..qu#',
+  '#qqBiB.q......q..AiAuq#',
+  '#qqBBB..q.q....q.AAAqq#',
+  '#qu.iquqqq..qquqqqi.qq#',
+  '#uq..uqqqu.qquqqqu..qu#',
+  '#qq....q...h..q.....uq#',
+  '#qq.................qq#',
+  '#qu..quqqq..qquqqq..qq#',
+  '#uq..uqq.......qqu..qu#',
+  '#qqquqqq.TTTTT.quqqquq#',
+  '#qquqqqu.......uqqquqq#',
+  '#######################',
+
+
 ],3.8,{name:'Cargo // V36 Container Deck',desc:'mapa novo inspirado no Cargo fornecido: contêineres densos, três lanes curtas e conectores em S',vibe:'cargo',
     sky:0x536477,skyTop:0x202a36,fogC:0x50606d,fog:[58,145],sun:[-18,30,16],hemi:.72,sunI:.48,exposure:.68,
     theme:{floor:['metal',0x34434a],wall:['metal',0x2b3339],crate:['crate',0x715641],container:['container',0x3f6274],metal:['metal',0x3c474d],stone:['concrete',0x5a6268],roof:['metal',0x2c363d]},build:v36CargoBuild,
-    areasC:[['Base Defesa',9,13,1,3],['Bomb B / Red Stack',2,6,3,6],['Bomb A / Blue Stack',16,20,3,6],['West Lane',2,5,6,15],['Center Lane',9,12,3,16],['East Lane',17,20,6,15],['Upper Cross',4,18,8,9],['Lower Cross',4,18,12,13],['Base Ataque',8,14,15,17]]});
+    areasC:[['Base Defesa',9,13,1,3],['Bomb B / Red Stack',2,6,7,10],['Bomb A / Blue Stack',16,20,7,10],['West Lane',2,5,6,15],['Center Lane',9,12,3,16],['East Lane',17,20,6,15],['Upper Cross',4,18,8,9],['Lower Cross',4,18,12,13],['Base Ataque',8,14,15,17]]});
 })();
 
 function mapInteract(){
@@ -17019,23 +17035,19 @@ ATMOS_POST.push((mapId, AT, M) => {
 });
 /* V44 COMPETITIVE SPAWN BALANCE */
 // The five-spawn squads and all original map collision/cover assets are preserved.
-// Shift a single CT start on Frostline/Kairo to allow early A/B defensive setups.
+// V45: fixed layout in grid instead of invisible forward-spawn overrides.
 if (MAPS.frostline?.spawnsB?.length === 5 && MAPS.kairo?.spawnsB?.length === 5) {
-  MAPS.frostline.spawnsB[0] = [14, -24];
-  MAPS.kairo.spawnsB[0] = [10, -28];
+  // Frostline outpost is now an authored C tile.
+  // Kairo defender flank is now an authored C tile.
 } else {
   console.warn('[STRYKE V44] Balanced spawns not applied: map structure changed');
 }
 
-/* V44 CARGO SPAWN ROUTE BALANCE */
-// Based on Chromium collision, line-of-sight, barrier and nav tests.
-// Keeps five distinct attacker spawns and all structural map geometry.
-if (MAPS.cargo?.spawns?.length === 5) {
-  MAPS.cargo.spawns.splice(0, 5, [-8,13], [-5,13], [-2,13], [1,13], [4,13]);
-} else {
-  console.warn('[STRYKE V44] Cargo spawn balance skipped: map structure changed');
-}
+/* V45 COMPETITIVE SPAWNS AND FREEZE BALANCE */
+// Cargo attacker starts use the authored T-only spawn grid, not center lane.
 
+/* V45 TWO-LANE ATTACKER ACCESS */
+/* V45 ACTIVE V36 MAP BASE CORRECTION */
 function buildMap(id) {
   const M = MAPS[id] || MAPS.arena; curMapId = MAPS[id] ? id : 'arena'; curMap = M; texZ = curMapId === 'vila'; // texturas da fase 3 só na Vila (o Sanatório recebe as dele na fase 5)
   texS = curMapId === 'sanatorio'; // 5B-1
