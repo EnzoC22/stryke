@@ -180,24 +180,27 @@ const report={schema:1,version:'V46.1',map:MAP,baseSeed:SEED,roundsRequested:ROU
   commit:process.env.GITHUB_SHA||null,rounds:[],replayPassed:false,summary:{}};
 
 try {
+  // A fresh JavaScript realm for every seed eliminates renderer, physics and
+  // singleton caches shared between rounds. Browser context still caches assets.
   const context=await browser.newContext({viewport:{width:1280,height:720}});
-  const page=await context.newPage();
-  page.on('pageerror',e=>errors.push(e.message.slice(0,500)));
-  await page.route('**/*',async route=>{
-    const req=new URL(route.request().url()),site=new URL(BASE);
-    if(req.origin!==site.origin || !['/','/index.html'].includes(req.pathname)) return route.continue();
-    const res=await route.fetch();
-    return route.fulfill({response:res,body:instrument(await res.text())});
-  });
-  const response=await page.goto(BASE,{waitUntil:'domcontentloaded',timeout:70000});
-  assert.equal(response.status(),200,'Game HTML not reachable');
-  await page.locator('#btnHost').waitFor({state:'visible',timeout:70000});
-  await page.waitForFunction(()=>!!window.__strykeV461,null,{timeout:45000});
-  const init=await page.evaluate(map=>window.__strykeV461.setup(map),MAP);
-  report.navNodes=init.nodes;
-
   async function oneRound(seed) {
-    const started=await page.evaluate(seed=>window.__strykeV461.start(seed),seed);
+    const page=await context.newPage();
+    try {
+      page.on('pageerror',e=>errors.push(e.message.slice(0,500)));
+      await page.route('**/*',async route=>{
+        const req=new URL(route.request().url()),site=new URL(BASE);
+        if(req.origin!==site.origin || !['/','/index.html'].includes(req.pathname)) return route.continue();
+        const res=await route.fetch();
+        return route.fulfill({response:res,body:instrument(await res.text())});
+      });
+      const response=await page.goto(BASE,{waitUntil:'domcontentloaded',timeout:70000});
+      assert.equal(response.status(),200,'Game HTML not reachable');
+      await page.locator('#btnHost').waitFor({state:'visible',timeout:70000});
+      await page.waitForFunction(()=>!!window.__strykeV461,null,{timeout:45000});
+      const init=await page.evaluate(map=>window.__strykeV461.setup(map),MAP);
+      if(report.navNodes!==undefined) assert.equal(init.nodes,report.navNodes,'Navgraph changed between seeded sessions');
+      report.navNodes=init.nodes;
+      const started=await page.evaluate(seed=>window.__strykeV461.start(seed),seed);
     assert.equal(started.phase,'live');
     assert.equal(started.players,10);
     let status={phase:'live'};
@@ -208,9 +211,10 @@ try {
     assert(['t','ct'].includes(round.winner),'Missing winner');
     assert(round.seconds>0 && round.seconds<=160,'Invalid elapsed time');
     assert(Object.keys(round.bots).length===10,'Bot roster changed unexpectedly');
-    return round;
+      return round;
+    } finally { await page.close(); }
   }
-  // Re-run identical seed on same page after complete reset. Entire report must match.
+  // Re-run the identical seed in an independent browser page. Entire report must match.
   if(REPLAY) {
     const sampleSeed=(SEED+MAPS.indexOf(MAP)*100000)>>>0;
     const first=await oneRound(sampleSeed);
