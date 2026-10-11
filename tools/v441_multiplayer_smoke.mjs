@@ -11,63 +11,80 @@ const diagnostics = [];
 function instrument(html) {
   const needle = /<\/script>\s*<\/body>/i;
   assert(needle.test(html), 'Main game module tag not found');
-  const hook = [
-    '// V44.1 test-only probe. This code is injected in the served response, never saved to index.html.',
-    'window.__v441 = {',
-    '  localPeer() {',
-    '    const Native = window.Peer;',
-    '    if (typeof Native !== "function") throw Error("PeerJS is not loaded");',
-    '    window.Peer = function LocalPeer(id, opts) {',
-    '      const local = {host:"127.0.0.1",port:9000,path:"/peer",key:"peerjs",secure:false,debug:1,config:{iceServers:[]}};',
-    '      if (id && typeof id === "object") return new Native({...id,...local});',
-    '      return new Native(id, {...(opts||{}),...local});',
-    '    };',
-    '    window.Peer.prototype = Native.prototype;',
-    '  },',
-    '  setName(value) { CFG.name=value; $("#inName").value=value; },',
-    '  configureRounds() {',
-    '    if (!NET.isHost || !LB.on || typeof LB.getForm !== "function") throw Error("Host lobby is not configured");',
-    '    const old = LB.getForm;',
-    '    LB.getForm = () => ({...old(),mode:"rounds",preset:"competitive",map:"vanta",rounds:3,bots:0});',
-    '  },',
-    '  startMatch() { if (!NET.isHost || !S.lobby) throw Error("Not host lobby"); lobbyStart(); },
-  buyKevlar() { if (NET.isHost || !inGame) throw Error("Guest not in game"); sendToHost({t:"buy",it:"kevlar"}); },
-  sendChat(value) { if (!inGame) throw Error("Cannot chat outside match"); sendToHost({t:"chat",txt:value}); },
-  configureFiveVsFive() {
-    if (!NET.isHost || !S.lobby || typeof LB.getForm !== "function") throw Error("Not host lobby");
-    const previous = LB.getForm;
-    LB.getForm = () => ({...previous(),mode:"rounds",preset:"competitive",map:"cargo",rounds:3,bots:8});
-  },',
-    '  endRound(team="t") { if (!NET.isHost || !["freeze","live"].includes(S.phase)) throw Error("Round not active"); if (team === "lead") team=S.score.t>=S.score.ct?"t":"ct"; srvEndRound(team,"tempo"); },',
-    '  nextRound() { if (!NET.isHost || S.phase!=="end") throw Error("Not in round-end"); srvStartRound(); srvState(); },',
-    '  closeLink() { if (NET.isHost || !NET.hostConn?.open) throw Error("No guest link"); NET.hostConn.close(); },',
-    '  snapshot() {',
-    '    const host = NET.isHost;',
-    '    return { host, online:!!NET.online, code:NET.code, joining:!!NET.joining,',
-    '      connected:!!NET.hostConn?.open, inGame:!!inGame, lobby:!!(host?S.lobby:LB.on),',
-    '      lobbyVisible:!$("#lobby").classList.contains("hidden"),',
-    '      myId:C.myId, mode:(host?S.st:C.st)?.mode, map:(host?S.st:C.st)?.map,
-      myMoney:me.money, myArmor:me.armor, myAlive:me.alive,
-      botCount:host?[...S.players.values()].filter(p=>p.isBot).length:null,
-      teamCounts:host?{
-        t:[...S.players.values()].filter(p=>p.team==="t").length,
-        ct:[...S.players.values()].filter(p=>p.team==="ct").length
-      }:{
-        t:[...C.players.values()].filter(p=>p.tm==="t").length,
-        ct:[...C.players.values()].filter(p=>p.tm==="ct").length
+  const hook = String.raw`
+// V44.1 browser-only probe; game production source is unmodified.
+window.__v441 = {
+  localPeer() {
+    const Native=window.Peer;
+    if(typeof Native!=="function") throw Error("PeerJS not loaded");
+    window.Peer=function LocalPeer(id,opts) {
+      const local={host:"127.0.0.1",port:9000,path:"/peer",key:"peerjs",secure:false,
+        debug:1,config:{iceServers:[]}};
+      if(id && typeof id==="object") return new Native({...id,...local});
+      return new Native(id,{...(opts||{}),...local});
+    };
+    window.Peer.prototype=Native.prototype;
+  },
+  setName(value){ CFG.name=value; $("#inName").value=value; },
+  configureRounds(){
+    if(!NET.isHost||!LB.on||typeof LB.getForm!=="function")throw Error("Host lobby unavailable");
+    const old=LB.getForm;
+    LB.getForm=()=>({...old(),mode:"rounds",preset:"competitive",map:"vanta",rounds:3,bots:0});
+  },
+  configureFiveVsFive(){
+    if(!NET.isHost||!LB.on||typeof LB.getForm!=="function")throw Error("Host lobby unavailable");
+    const old=LB.getForm;
+    LB.getForm=()=>({...old(),mode:"rounds",preset:"competitive",map:"cargo",rounds:3,bots:8});
+  },
+  startMatch(){ if(!NET.isHost||!S.lobby)throw Error("Not host lobby");lobbyStart(); },
+  endRound(team="t"){
+    if(!NET.isHost||!["freeze","live"].includes(S.phase))throw Error("Round not active");
+    if(team==="lead")team=S.score.t>=S.score.ct?"t":"ct";
+    srvEndRound(team,"tempo");
+  },
+  nextRound(){
+    if(!NET.isHost||S.phase!=="end")throw Error("Not in round-end");
+    srvStartRound();srvState();
+  },
+  buyKevlar(){
+    if(NET.isHost||!inGame)throw Error("Guest not in game");
+    sendToHost({t:"buy",it:"kevlar"});
+  },
+  sendChat(value){
+    if(!inGame)throw Error("Cannot chat outside match");
+    sendToHost({t:"chat",txt:value});
+  },
+  closeLink(){
+    if(NET.isHost||!NET.hostConn?.open)throw Error("Guest link unavailable");
+    NET.hostConn.close();
+  },
+  snapshot(){
+    const host=NET.isHost;
+    const all=host?[...S.players.values()]:[...C.players.values()];
+    return {
+      host,online:!!NET.online,code:NET.code,joining:!!NET.joining,
+      connected:!!NET.hostConn?.open,inGame:!!inGame,lobby:!!(host?S.lobby:LB.on),
+      lobbyVisible:!$("#lobby").classList.contains("hidden"),
+      myId:C.myId,mode:(host?S.st:C.st)?.mode,map:(host?S.st:C.st)?.map,
+      myMoney:me.money,myArmor:me.armor,myAlive:me.alive,
+      botCount:host?all.filter(p=>p.isBot).length:null,
+      teamCounts:{
+        t:all.filter(p=>(host?p.team:p.tm)==="t").length,
+        ct:all.filter(p=>(host?p.team:p.tm)==="ct").length
       },
-      chatText:$("#chatlog")?.textContent?.slice(-350)||"",',
-    '      round:host?S.round:C.round, phase:host?S.phase:C.phase,',
-    '      score:host?S.score:C.sc,',
-    '      livePlayers:host?[...S.players.values()].filter(p=>!p.isBot).map(p=>({id:p.id,name:p.name,team:p.team,alive:p.alive,armor:p.armor, money:p.money})):',
-    '        [...C.players.values()].map(p=>({id:p.id,name:p.n,team:p.tm,alive:p.al})),',
-    '      roster:(LB.data?.pl||[]).map(p=>({id:p.id,name:p.n,team:p.tm})),',
-    '      joinStatus:$("#joinStatus")?.textContent || "",',
-    '      gameStatus:$("#center")?.textContent?.slice(0,120) || ""',
-    '    };',
-    '  }',
-    '};'
-  ].join('\n');
+      chatText:$("#chatlog")?.textContent?.slice(-350)||"",
+      round:host?S.round:C.round,phase:host?S.phase:C.phase,
+      score:host?S.score:C.sc,
+      livePlayers:host?all.filter(p=>!p.isBot).map(p=>({
+        id:p.id,name:p.name,team:p.team,alive:p.alive,armor:p.armor,money:p.money
+      })):all.map(p=>({id:p.id,name:p.n,team:p.tm,alive:p.al})),
+      roster:(LB.data?.pl||[]).map(p=>({id:p.id,name:p.n,team:p.tm})),
+      joinStatus:$("#joinStatus")?.textContent||"",
+      gameStatus:$("#center")?.textContent?.slice(0,120)||""
+    };
+  }
+};
+`;
   // Test-only CSP adjustment: allow the local PeerServer WebSocket during the test.
   // The checked-in game HTML and its production Content Security Policy stay unchanged.
   const htmlLocal = html.replace(/<meta\b[^>]*http-equiv\s*=\s*["']Content-Security-Policy["'][^>]*>/gi, '');
