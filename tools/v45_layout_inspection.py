@@ -25,3 +25,11 @@ for ident in ('vanta','frostline','kairo','cargo'):
 print("\n## PRE BARRIERS")
 for m in list(re.finditer(r"PRE_BARRIERS\s*=",s))[:3]:
  print("PRE_OFFSET",m.start(),"LINE",s.count('\n',0,m.start())+1,"TEXT",s[m.start():m.start()+7400])
+
+print("\n## RUNTIME OVERRIDES AFTER ALL GRID DECLARATIONS")
+for id in ('vanta','frostline','kairo','cargo'):
+  for pat in (rf"MAPS\.{id}\s*=",rf"MAPS\.{id}\.spawnsB",rf"MAPS\.{id}\.spawns",rf"MAPS\[{repr(id)}\]"):
+    results=[m.start() for m in re.finditer(pat,s)]
+    print(id,pat,'hits',len(results))
+    for i in results[:12]:
+      print('SOURCE',s.count('\n',0,i)+1,repr(s[max(0,i-130):i+300]))
