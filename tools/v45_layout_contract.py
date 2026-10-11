@@ -5,8 +5,9 @@ from pathlib import Path
 s=Path('index.html').read_text(encoding='utf-8')
 maps={}
 for name in ('vanta','frostline','kairo','cargo'):
-    m=re.search(r'MAPS\.'+name+r'\s*=\s*gridMap\(\[\s*(.*?)\s*\],\s*([\d.]+)',s,re.S)
-    assert m,'missing grid '+name
+    all_versions=list(re.finditer(r'MAPS\.'+name+r'\s*=\s*gridMap\(\[\s*(.*?)\s*\],\s*([\d.]+)',s,re.S))
+    assert all_versions,'missing grid '+name
+    m=all_versions[-1]  # the active V36 map overrides obsolete earlier declarations
     rows=re.findall(r"'([#.\w]+)'",m.group(1))
     unit=float(m.group(2))
     assert rows and len(set(map(len,rows)))==1,name+' ragged rows'
