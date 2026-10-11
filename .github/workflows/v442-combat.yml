@@ -5,6 +5,7 @@ on:
     branches: [main, v44-2-combat-network-stability]
     paths:
       - tools/v442_combat_network_smoke.mjs
+      - tools/v442_bomb_race_unit.mjs
       - .github/workflows/v442-combat.yml
       - index.html
   workflow_dispatch:
@@ -25,6 +26,10 @@ jobs:
         run: |
           node --check tools/v442_combat_network_smoke.mjs
           node --check tools/v441_peer_server.mjs
+      - name: Verify authoritative bomb expiry and defuse ordering
+        run: |
+          node --check tools/v442_bomb_race_unit.mjs
+          node tools/v442_bomb_race_unit.mjs
       - name: Install Chromium and local signaling
         run: |
           npm install --no-save --no-package-lock playwright@1.56.1 peer@1.0.2 express@4.21.2
