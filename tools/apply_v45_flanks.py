@@ -60,15 +60,12 @@ b="['Base Defesa',7,13,2,6],['CT Outpost',12,15,3,5],['Hangar'"
 if s.count(a)!=1:raise SystemExit('Frostline CT callout missing')
 s=s.replace(a,b,1)
 s=s.replace("\nfunction buildMap(id) {",f"\n{tag}\nfunction buildMap(id) {{",1)
-# Rebuilding authored grid literals may leave a whitespace-only line at the end
-# of the Cargo definition; strip it only within this narrowly scoped region.
+# Clean whitespace introduced by replacing Cargo grid text, without touching
+# other sections of the original HTML.
 lo=s.index('MAPS.cargo=gridMap([')
 hi=s.index('function mapInteract()',lo)
-part=s[lo:hi]
-s=s[:lo]+re.sub(r'(?m)^[ \\t]+
-p.write_text(s,encoding='utf-8')
-print('V45: restored balanced attacker flanks and legitimate CT site staging')
-, '', part)+s[hi:]
+chunk=s[lo:hi]
+s=s[:lo]+"\n".join(line.rstrip() for line in chunk.split("\n"))+s[hi:]
 if abs(len(s)-len(old))>2300:raise SystemExit('Unexpected diff size')
 p.write_text(s,encoding='utf-8')
 print('V45: restored balanced attacker flanks and legitimate CT site staging')
