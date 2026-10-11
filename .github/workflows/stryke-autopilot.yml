@@ -79,7 +79,7 @@ jobs:
       - name: Install Chromium only when code changed
         if: steps.change.outputs.changed == 'true'
         run: |
-          npm install --no-save --no-package-lock playwright@1.56.1
+          npm install --no-save --no-package-lock playwright@1.56.1 peer@1.0.2 express@4.21.2
           npx playwright install --with-deps chromium
       - name: Serve potential update locally
         if: steps.change.outputs.changed == 'true'
@@ -98,6 +98,19 @@ jobs:
         run: |
           node tools/v44_map_smoke.mjs
           node tools/v43_mobile_smoke.mjs
+      - name: Run full two-client multiplayer and combat tests before committing
+        if: steps.change.outputs.changed == 'true'
+        env:
+          STRYKE_TEST_URL: http://127.0.0.1:9000/
+        run: |
+          node tools/v441_peer_server.mjs >/tmp/stryke-autopilot-peer.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS -o /dev/null http://127.0.0.1:9000/; then break; fi
+            sleep 1
+          done
+          curl -fsS -o /dev/null http://127.0.0.1:9000/
+          node tools/v441_multiplayer_smoke.mjs
+          node tools/v442_combat_network_smoke.mjs
       - name: Commit only approved code repairs
         if: steps.change.outputs.changed == 'true' && github.ref == 'refs/heads/main'
         run: |
