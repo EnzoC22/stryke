@@ -70,6 +70,10 @@ window.__v441 = {
     if(NET.isHost||!NET.hostConn?.open)throw Error("No live guest connection");
     sendToHost(message);
   },
+  hostEmit(message){
+    if(!NET.isHost)throw Error("Not the authoritative host");
+    sendToHost(message);
+  },
   duelSetup(){
     if(!NET.isHost||S.st.mode!=="rounds"||!inGame)throw Error("Host not in rounds");
     const victim=S.players.get("h"),shooter=[...S.players.values()].find(p=>!p.isBot&&p.id!=="h");
@@ -333,7 +337,7 @@ try {
     'CT must not be allowed to plant bomb');
   console.log('PASS bomb anti-cheat: defender cannot plant attacker bomb');
 
-  await host.evaluate(()=>sendToHost({t:'bomb',on:1}));
+  await host.evaluate(()=>window.__v441.hostEmit({t:'bomb',on:1}));
   await until(host,()=>window.__v441.snapCombat().bomb?.st==='planted',
     'actual planting duration',12000);
   await until(guest,()=>window.__v441.snapCombat().bomb?.st==='planted',
@@ -361,7 +365,7 @@ try {
 
   const round2=await host.evaluate(()=>window.__v441.bombSetup());
   console.log('BOMB_EXPLOSION_FIXTURE',JSON.stringify(round2));
-  await host.evaluate(()=>sendToHost({t:'bomb',on:1}));
+  await host.evaluate(()=>window.__v441.hostEmit({t:'bomb',on:1}));
   await until(guest,()=>window.__v441.snapCombat().bomb?.st==='planted',
     'second plant broadcast',12000);
   await host.evaluate(()=>window.__v441.accelerateBomb());
