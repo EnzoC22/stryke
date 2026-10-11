@@ -1,0 +1,56 @@
+name: V44.2 Combat and Network Regression
+
+on:
+  push:
+    branches: [main, v44-2-combat-network-stability]
+    paths:
+      - tools/v442_combat_network_smoke.mjs
+      - tools/v442_bomb_race_unit.mjs
+      - .github/workflows/v442-combat.yml
+      - index.html
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  combat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate browser test scripts
+        run: |
+          node --check tools/v442_combat_network_smoke.mjs
+          node --check tools/v441_peer_server.mjs
+      - name: Verify authoritative bomb expiry and defuse ordering
+        run: |
+          node --check tools/v442_bomb_race_unit.mjs
+          node tools/v442_bomb_race_unit.mjs
+      - name: Install Chromium and local signaling
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 peer@1.0.2 express@4.21.2
+          npx playwright install --with-deps chromium
+      - name: Run local game and PeerJS on one origin
+        run: |
+          node tools/v441_peer_server.mjs > /tmp/v442-peer.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS -o /dev/null http://127.0.0.1:9000/; then
+              echo "Local game and WebRTC signaling ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          tail -100 /tmp/v442-peer.log
+          exit 1
+      - name: Validate real combat and bomb messages between two browsers
+        env:
+          STRYKE_TEST_URL: http://127.0.0.1:9000/
+        run: node tools/v442_combat_network_smoke.mjs
+      - name: Show local WebRTC diagnostics on failure
+        if: failure()
+        run: |
+          if test -f /tmp/v442-peer.log; then tail -100 /tmp/v442-peer.log; fi

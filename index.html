@@ -22052,6 +22052,8 @@ function bombTick() {
     const a = p.act; if (!a) continue;
     if (!p.alive || Math.hypot(p.pos[0] - a.x, p.pos[2] - a.z) > .8 || (a.k === 'p' && (B?.st !== 'carried' || B.by !== p.id)) || (a.k === 'd' && B?.st !== 'planted')) { p.act = null; continue; }
     if (now < a.end) continue;
+    // V44.2: a defuse cannot win if its completion tick occurs after the bomb deadline.
+    if (a.k === 'd' && B?.st === 'planted' && now >= B.end) { p.act = null; continue; }
     p.act = null; p.money = Math.min(16000, p.money + 300);
     if (a.k === 'd') { B.st = 'defused'; B.mvp = p.id; return srvEndRound('ct', 'A bomba foi desarmada'); }
     Object.assign(B, { st: 'planted', pl: true, mvp: p.id, pos: p.pos.slice(), site: inSite(p.pos[0], p.pos[2]), end: now + BOMB.timer }); S.phaseEnd = B.end;
