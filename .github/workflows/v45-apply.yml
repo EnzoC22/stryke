@@ -1,4 +1,5 @@
 name: V45 Apply Active Map Grid Fix
+# Retry after cleaning archived grid whitespace
 
 on:
   push:
