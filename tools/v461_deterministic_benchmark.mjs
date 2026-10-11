@@ -52,6 +52,14 @@ function instrument(html) {
         if (!MAPS[map]?.sites?.A || !MAPS[map]?.sites?.B) throw Error('Two bombsites required');
         const priorKill = srvKill;
         const probe = this;
+        // Suppress browser HUD/UI rendering messages while the headless host
+        // simulates 10 bots. Server-authoritative bot logic remains unmodified.
+        // HUD callbacks consume random draws depending on asset load timing.
+        const realOnMsg = onMsg;
+        onMsg = function(message) {
+          if (probe.active) return;
+          return realOnMsg(message);
+        };
         srvKill = function(v, a, w, hs) {
           if (probe.current && S.phase === 'live' && v?.alive) {
             const evt = { t: Math.round((now-S.liveStart)*10)/10,
