@@ -131,6 +131,13 @@ window.__v441 = {
       kit:defender.kit,round:S.round,sitePoint:pt};
   },
   nextCompetitiveRound(){if(!NET.isHost||S.phase!=="end")throw Error("Round not over");srvStartRound();srvState()},
+  extendDefuseForCancelTest(){
+    if(!NET.isHost)throw Error("Host-only fixture");
+    const ct=[...S.players.values()].find(p=>p.team==="ct"&&p.act?.k==="d");
+    if(!ct)throw Error("No active defuse to extend");
+    // Test-only extension: browser evaluation can stall on software rendering.
+    ct.act.end=now+35;
+  },
   accelerateBomb(){
     if(!NET.isHost||S.bomb?.st!=="planted")throw Error("Not a planted bomb");
     S.bomb.end=now-.25;bombTick();srvState();
@@ -356,6 +363,7 @@ try {
   await guest.evaluate(()=>window.__v441.emit({t:'bomb',on:1}));
   await until(host,()=>window.__v441.snapCombat().players.some(p=>p.id==='p1'&&p.act==='d'),
     'remote defuse begins',6000);
+  await host.evaluate(()=>window.__v441.extendDefuseForCancelTest());
   await guest.waitForTimeout(650);
   await guest.evaluate(()=>window.__v441.emit({t:'bomb',on:0}));
   await until(host,()=>window.__v441.snapCombat().players.some(p=>p.id==='p1'&&!p.act),
