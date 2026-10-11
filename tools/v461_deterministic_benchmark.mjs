@@ -66,7 +66,6 @@ function instrument(html) {
       },
       start(seed) {
         if (!this.active || !this.map) throw Error('Setup required');
-        this.state = seed >>> 0;
         this.time = 1000;
         now = this.time;
         S.players.clear();
@@ -76,11 +75,14 @@ function instrument(html) {
         S.lobby = false; S.fromLobby = false;
         S.drops?.clear();
         this.current = null;
+        // The map renderer performs an implementation-dependent number of
+        // cosmetic random draws as models/materials warm up. Use a SEPARATE
+        // deterministic stream for the world, then reseed the gameplay stream.
+        // Otherwise map initialization changes site selection / bot tactics.
+        this.state = (seed ^ 0x9e3779b9) >>> 0;
+        this.withRng(() => buildMap(this.map));
+        this.state = seed >>> 0;
         this.withRng(() => {
-          // A new round is an independent benchmark scenario: reset physical
-          // world, collision caches, navigation and all interactive map state.
-          // Resetting only S.players leaves renderer/map globals between runs.
-          buildMap(this.map);
           for (let i=0;i<10;i++) {
             const p=srvAddPlayer('bot'+i,'V461 Bot '+i,true);
             setTeam(p,i<5?'t':'ct');
