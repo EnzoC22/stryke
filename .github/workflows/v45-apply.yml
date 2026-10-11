@@ -19,7 +19,9 @@ jobs:
         with:
           fetch-depth: 0
       - name: Apply guarded layout corrections
-        run: python3 tools/apply_v45_flanks.py
+        run: |
+          python3 -m py_compile tools/apply_v45_flanks.py
+          python3 tools/apply_v45_flanks.py
       - name: Validate all inline Javascript and narrow diff
         run: |
           set -euo pipefail
