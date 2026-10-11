@@ -1,5 +1,5 @@
 name: V45 Map and Spawn Validation
-# Validate the completed flank-corridor and canonical spawn update
+# Confirm active V36 layouts and attack routes with real browser validation
 on:
   push:
     branches: [v45-map-spawns-and-routes-overhaul]
