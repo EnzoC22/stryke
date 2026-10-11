@@ -328,7 +328,7 @@ try {
   assert.equal(stage.site,'A');
   assert.equal(stage.attacker,'h');
   assert.equal(stage.defender,lane.shooter);
-  await until(guest,()=>window.__v441.snapCombat().bomb?.st==='carried',
+  await until(guest,()=>window.__v441.snapshot().bombState==='carried',
     'guest sees carried bomb',12000);
 
   await guest.evaluate(()=>window.__v441.emit({t:'bomb',on:1}));
@@ -340,7 +340,7 @@ try {
   await host.evaluate(()=>window.__v441.hostEmit({t:'bomb',on:1}));
   await until(host,()=>window.__v441.snapCombat().bomb?.st==='planted',
     'actual planting duration',12000);
-  await until(guest,()=>window.__v441.snapCombat().bomb?.st==='planted',
+  await until(guest,()=>window.__v441.snapshot().bombState==='planted',
     'plant replication',12000);
   console.log('PASS bomb: attacker planted at site A; remote client received state');
 
@@ -366,7 +366,7 @@ try {
   const round2=await host.evaluate(()=>window.__v441.bombSetup());
   console.log('BOMB_EXPLOSION_FIXTURE',JSON.stringify(round2));
   await host.evaluate(()=>window.__v441.hostEmit({t:'bomb',on:1}));
-  await until(guest,()=>window.__v441.snapCombat().bomb?.st==='planted',
+  await until(guest,()=>window.__v441.snapshot().bombState==='planted',
     'second plant broadcast',12000);
   await host.evaluate(()=>window.__v441.accelerateBomb());
   await until(guest,()=>window.__v441.snapCombat().phase==='end' &&
