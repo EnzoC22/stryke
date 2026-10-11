@@ -2,7 +2,7 @@ name: V44.2 Combat and Network Regression
 
 on:
   push:
-    branches: [v44-2-combat-network-stability]
+    branches: [main, v44-2-combat-network-stability]
     paths:
       - tools/v442_combat_network_smoke.mjs
       - .github/workflows/v442-combat.yml
