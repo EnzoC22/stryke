@@ -66,12 +66,12 @@ def proposals(src,maps,metrics):
             if d['t_steps'] is None or d['ct_steps'] is None:
                 add(100,'rotas',f'{name}: reabrir acesso ao bombsite {site}',
                     'A malha de células não conecta ambas as bases ao objetivo')
-            elif d['ct_lead_units']>13:
+            elif d['ct_lead_units']>27:
                 add(93,'balanceamento',f'{name}: reduzir vantagem defensiva em {site}',
-                    f'Rota aproximada CT chega {d["ct_lead_units"]} unidades antes; rever conectores e entradas')
-            elif d['ct_lead_units']<0:
+                    f'Heurística em grade sugere {d["ct_lead_units"]} unidades CT; conferir no Chromium antes de corrigir')
+            elif d['ct_lead_units']< -27:
                 add(85,'balanceamento',f'{name}: revisar chegada defensiva em {site}',
-                    f'Rota aproximada T chega {-d["ct_lead_units"]} unidades antes; conferir jogo real')
+                    f'Heurística em grade sugere {-d["ct_lead_units"]} unidades T; confirmar no Chromium')
             if d['plant_tiles']<5:
                 add(92,'bombsite',f'{name}: ampliar espaço utilizável em {site}',
                     f'Apenas {d["plant_tiles"]} células de plant no grid')
@@ -150,7 +150,7 @@ path.parent.mkdir(parents=True,exist_ok=True)
 path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 summary=os.environ.get('GITHUB_STEP_SUMMARY')
 out=['## STRYKE · Ciclo de melhoria (20 minutos)',
-     'Auditoria de mapas e ranking por regras. **Não é uma sessão autônoma do ChatGPT.**','']
+     'Auditoria de mapas e ranking por regras; métricas da grade são aproximadas e não substituem o teste Chromium. **Não é uma sessão autônoma do ChatGPT.**','']
 for i,idea in enumerate(report['ideas'],1):
     out.append(f"{i}. **{idea['title']}** — {idea['reason']}")
 out.extend(['',f"**Correções previamente verificadas aplicadas:** {', '.join(report['applied']) or 'nenhuma (jogo preservado)'}"])
