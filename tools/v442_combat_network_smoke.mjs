@@ -136,7 +136,7 @@ window.__v441 = {
     return {
       inGame,host,online:!!NET.online,phase:host?S.phase:C.phase,
       round:host?S.round:C.round,score:host?{...S.score}:C.sc,
-      bomb:host?{...S.bomb}:C.bomb,
+      bomb:host?{...S.bomb}:(C.bomb ? {...C.bomb, st:C.bomb.s} : null),
       players:host?[...S.players.values()].filter(p=>!p.isBot).map(p=>({
         id:p.id,team:p.team,pos:p.pos.slice(),yaw:p.yaw,pitch:p.pitch,
         hp:p.hp,armor:p.armor,kit:p.kit,alive:p.alive,
@@ -163,6 +163,7 @@ window.__v441 = {
       },
       chatText:$("#chatlog")?.textContent?.slice(-350)||"",
       round:host?S.round:C.round,phase:host?S.phase:C.phase,
+      bombState:host?S.bomb?.st:C.bomb?.s,
       score:host?S.score:C.sc,
       livePlayers:host?all.filter(p=>!p.isBot).map(p=>({
         id:p.id,name:p.name,team:p.team,alive:p.alive,armor:p.armor,money:p.money
