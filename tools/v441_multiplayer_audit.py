@@ -25,3 +25,8 @@ for needle in ("const NET =", "const LB =", "function lobbyHost", "function lobb
     for i in ids[:2]:
         print("DETAIL",needle,"LINE",i+1)
         print("\n".join(f"{j+1}: {lines[j]}" for j in range(max(0,i-5),min(len(lines),i+55)))[:12500])
+
+for lo,hi in [(131,165),(810,868),(21210,21243),(21453,21575),(21888,21997),(26640,26689),(26705,26755)]:
+    print("RANGE",lo,hi)
+    for j in range(lo-1,min(hi,len(lines))):
+        print(f"{j+1}: {lines[j]}")
