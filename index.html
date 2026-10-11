@@ -2020,19 +2020,19 @@ const PRE_BARRIERS = Object.freeze({
   // two horizontal segments keep T bots distributed between left/right staging lanes.
   vanta:{
     t:[{ax:'z',v:29,a:-60,b:-9,side:'gte'},{ax:'z',v:29,a:-9,b:60,side:'gte'}],
-    ct:[{ax:'z',v:25,a:-60,b:-9,side:'lte'},{ax:'z',v:25,a:-9,b:60,side:'lte'}]
+    ct:[{ax:'z',v:-29,a:-60,b:-9,side:'lte'},{ax:'z',v:-29,a:-9,b:60,side:'lte'}]
   },
   frostline:{
-    t:[{ax:'z',v:34,a:-55,b:-8,side:'gte'},{ax:'z',v:34,a:-8,b:55,side:'gte'}],
-    ct:[{ax:'z',v:30,a:-55,b:-8,side:'lte'},{ax:'z',v:30,a:-8,b:55,side:'lte'}]
+    t:[{ax:'z',v:31,a:-55,b:-8,side:'gte'},{ax:'z',v:31,a:-8,b:55,side:'gte'}],
+    ct:[{ax:'z',v:-35,a:-55,b:-8,side:'lte'},{ax:'z',v:-35,a:-8,b:55,side:'lte'}]
   },
   kairo:{
-    t:[{ax:'z',v:32,a:-55,b:-8,side:'gte'},{ax:'z',v:32,a:-8,b:55,side:'gte'}],
-    ct:[{ax:'z',v:29,a:-55,b:-8,side:'lte'},{ax:'z',v:29,a:-8,b:55,side:'lte'}]
+    t:[{ax:'z',v:24,a:-55,b:-8,side:'gte'},{ax:'z',v:24,a:-8,b:55,side:'gte'}],
+    ct:[{ax:'z',v:-24,a:-55,b:-8,side:'lte'},{ax:'z',v:-24,a:-8,b:55,side:'lte'}]
   },
   cargo:{
-    t:[{ax:'z',v:12,a:-50,b:0,side:'gte'},{ax:'z',v:12,a:0,b:50,side:'gte'}],
-    ct:[{ax:'z',v:6,a:-50,b:0,side:'lte'},{ax:'z',v:6,a:0,b:50,side:'lte'}]
+    t:[{ax:'z',v:23,a:-50,b:0,side:'gte'},{ax:'z',v:23,a:0,b:50,side:'gte'}],
+    ct:[{ax:'z',v:-23,a:-50,b:0,side:'lte'},{ax:'z',v:-23,a:0,b:50,side:'lte'}]
   }
 });
 const preTeamLocal=()=>C.players.get(C.myId)?.tm||null;
@@ -2362,29 +2362,31 @@ function v36CargoBuild(M){
     areasC:[['B Metro',1,6,1,5],['North Offices',7,15,1,5],['Base Defesa',11,16,2,5],['Lobby / Mid',4,11,7,10],['Market Rooms',2,8,8,12],['A Plaza',8,13,10,13],['South Entry',1,7,12,15],['Base Ataque',1,5,12,14]]});
 
   MAPS.cargo=gridMap([
-'#######################',
-'#qquqqquq.....quqqquqq#',
-'#quqqquqqCCCCCuqqquqqq#',
-'#u.h...qq.....qq...h.u#',
-'#q.BBB.quq..uqqq.AAA.q#',
-'#q.BBi...........iAA.q#',
-'#q........h..........q#',
-'#uq..uqqquq.quqqqu..qu#',
-'#qq....q......q.....uq#',
-'#qq.....q.q....q....qq#',
-'#qu.iquqqq..qquqqqi.qq#',
-'#uq..uqqqu.qquqqqu..qu#',
-'#qq....q...h..q.....uq#',
-'#qq.....q......q....qq#',
-'#qu..quqqq..qquqqq..qq#',
-'#uq..uqq.......qqu..qu#',
-'#qqquqqq.TTTTT.quqqquq#',
-'#qquqqqu.......uqqquqq#',
-'#######################'
+
+  '#######################',
+  '#qquqqquq.....quqqquqq#',
+  '#quqqquqqCCCCCuqqquqqq#',
+  '#u.h...qq.....qq...h.u#',
+  '#q.....quq..uqqq.....q#',
+  '#q...i...........i...q#',
+  '#q........h..........q#',
+  '#uq..uqqquq.quqqqu..qu#',
+  '#qqBiB.q......q..AiAuq#',
+  '#qqBBB..q.q....q.AAAqq#',
+  '#qu.iquqqq..qquqqqi.qq#',
+  '#uq..uqqqu.qquqqqu..qu#',
+  '#qq....q...h..q.....uq#',
+  '#qq.....q......q....qq#',
+  '#qu..quqqq..qquqqq..qq#',
+  '#uq..uqq.......qqu..qu#',
+  '#qqquqqq.TTTTT.quqqquq#',
+  '#qquqqqu.......uqqquqq#',
+  '#######################',
+
 ],3.8,{name:'Cargo // V36 Container Deck',desc:'mapa novo inspirado no Cargo fornecido: contêineres densos, três lanes curtas e conectores em S',vibe:'cargo',
     sky:0x536477,skyTop:0x202a36,fogC:0x50606d,fog:[58,145],sun:[-18,30,16],hemi:.72,sunI:.48,exposure:.68,
     theme:{floor:['metal',0x34434a],wall:['metal',0x2b3339],crate:['crate',0x715641],container:['container',0x3f6274],metal:['metal',0x3c474d],stone:['concrete',0x5a6268],roof:['metal',0x2c363d]},build:v36CargoBuild,
-    areasC:[['Base Defesa',9,13,1,3],['Bomb B / Red Stack',2,6,3,6],['Bomb A / Blue Stack',16,20,3,6],['West Lane',2,5,6,15],['Center Lane',9,12,3,16],['East Lane',17,20,6,15],['Upper Cross',4,18,8,9],['Lower Cross',4,18,12,13],['Base Ataque',8,14,15,17]]});
+    areasC:[['Base Defesa',9,13,1,3],['Bomb B / Red Stack',2,6,7,10],['Bomb A / Blue Stack',16,20,7,10],['West Lane',2,5,6,15],['Center Lane',9,12,3,16],['East Lane',17,20,6,15],['Upper Cross',4,18,8,9],['Lower Cross',4,18,12,13],['Base Ataque',8,14,15,17]]});
 })();
 
 function mapInteract(){
@@ -17027,14 +17029,8 @@ if (MAPS.frostline?.spawnsB?.length === 5 && MAPS.kairo?.spawnsB?.length === 5) 
   console.warn('[STRYKE V44] Balanced spawns not applied: map structure changed');
 }
 
-/* V44 CARGO SPAWN ROUTE BALANCE */
-// Based on Chromium collision, line-of-sight, barrier and nav tests.
-// Keeps five distinct attacker spawns and all structural map geometry.
-if (MAPS.cargo?.spawns?.length === 5) {
-  MAPS.cargo.spawns.splice(0, 5, [-8,13], [-5,13], [-2,13], [1,13], [4,13]);
-} else {
-  console.warn('[STRYKE V44] Cargo spawn balance skipped: map structure changed');
-}
+/* V45 COMPETITIVE SPAWNS AND FREEZE BALANCE */
+// Cargo attacker starts use the authored T-only spawn grid, not center lane.
 
 function buildMap(id) {
   const M = MAPS[id] || MAPS.arena; curMapId = MAPS[id] ? id : 'arena'; curMap = M; texZ = curMapId === 'vila'; // texturas da fase 3 só na Vila (o Sanatório recebe as dele na fase 5)
