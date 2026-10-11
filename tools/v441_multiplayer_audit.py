@@ -37,3 +37,11 @@ for needle in ("function onMsg(", "function srvHandle(", "function lobbyUI(", "f
         print("GAME DETAIL",needle,"AT",i+1)
         for j in range(i,min(len(lines),i+100 if needle in ("function onMsg(","function srvHandle(","function lobbyUI(") else i+35)):
             print(f"{j+1}: {lines[j]}")
+
+for needle in ("function srvBuy(", "case 'tolobby':", "case 'lobby':", "case 'team':", "case 'chat':"):
+    for i,line in enumerate(lines):
+        if needle in line:
+            print("BUY/LOBBY DETAIL",needle,"LINE",i+1)
+            for j in range(max(0,i-4),min(len(lines),i+38)):
+                print(f"{j+1}: {lines[j]}")
+            break
