@@ -23,7 +23,7 @@ jobs:
         run: python3 tools/v45_layout_contract.py
       - name: Install Chromium for map collision and nav testing
         run: |
-          npm install --no-save --no-package-lock playwright@1.56.1
+          npm install --no-save --no-package-lock playwright@1.56.1 peer@1.0.2 express@4.21.2
           npx playwright install --with-deps chromium
       - name: Start local version
         run: |
@@ -38,3 +38,18 @@ jobs:
         run: node tools/v44_map_smoke.mjs
       - name: Test mobile interactions
         run: node tools/v43_mobile_smoke.mjs
+      - name: Test multiplayer with two humans and Cargo 5v5 bots
+        env:
+          STRYKE_TEST_URL: http://127.0.0.1:9000/
+        run: |
+          node tools/v441_peer_server.mjs >/tmp/v45-peer.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS -o /dev/null http://127.0.0.1:9000/; then break; fi
+            sleep 1
+          done
+          curl -fsS -o /dev/null http://127.0.0.1:9000/
+          node tools/v441_multiplayer_smoke.mjs
+      - name: Test combat, site planting and bomb objectives
+        env:
+          STRYKE_TEST_URL: http://127.0.0.1:9000/
+        run: node tools/v442_combat_network_smoke.mjs
