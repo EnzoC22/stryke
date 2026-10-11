@@ -51,7 +51,10 @@ function instrument(html) {
     '  }',
     '};'
   ].join('\n');
-  return html.replace(needle, hook + '\n$&');
+  // Test-only CSP adjustment: allow the local PeerServer WebSocket during the test.
+  // The checked-in game HTML and its production Content Security Policy stay unchanged.
+  const htmlLocal = html.replace(/<meta\\b[^>]*http-equiv\\s*=\\s*["']Content-Security-Policy["'][^>]*>/gi, '');
+  return htmlLocal.replace(needle, hook + '\n  return html.replace(needle, hook + '\n$&');');
 }
 
 async function setupPage(context, label) {
@@ -73,7 +76,7 @@ async function setupPage(context, label) {
   assert.equal(response.status(),200,'initial HTML response not 200');
   await page.locator('#btnHost').waitFor({state:'visible',timeout:60000});
   await page.waitForFunction(() => typeof window.__v441 === 'object' && typeof window.Peer === 'function',
-    {timeout:60000});
+    null, {timeout:60000});
   await page.evaluate(() => window.__v441.localPeer());
   console.log('PASS',label,'boot and local signaling configured');
   return page;
@@ -82,7 +85,7 @@ async function setupPage(context, label) {
 const state = async page => page.evaluate(() => window.__v441.snapshot());
 async function until(page,predicate,label,ms=45000) {
   try {
-    await page.waitForFunction(predicate, {timeout:ms,polling:200});
+    await page.waitForFunction(predicate, null, {timeout:ms,polling:200});
   } catch (e) {
     console.error('STATE TIMEOUT',label,JSON.stringify(await state(page)));
     throw e;
