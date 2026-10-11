@@ -34,7 +34,7 @@ jobs:
     timeout-minutes: 45
     env:
       V461_MAP: ${{ matrix.map }}
-      V461_ROUNDS: ${{ github.event_name == 'workflow_dispatch' && inputs.rounds || '2' }}
+      V461_ROUNDS: ${{ github.event_name == 'workflow_dispatch' && inputs.rounds || (github.ref == 'refs/heads/v461-deterministic-benchmark' && '100' || '2') }}
       V461_SEED: '461000'
       V461_REPLAY: '1'
       STRYKE_TEST_URL: http://127.0.0.1:8765/
