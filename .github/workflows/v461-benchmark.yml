@@ -1,0 +1,108 @@
+name: V46.1 Deterministic Benchmark
+
+on:
+  push:
+    branches: [main, v461-deterministic-benchmark]
+    paths:
+      - index.html
+      - tools/v461_deterministic_benchmark.mjs
+      - tools/v461_report.py
+      - .github/workflows/v461-benchmark.yml
+  workflow_dispatch:
+    inputs:
+      rounds:
+        description: Independent seeded bot rounds per competitive map
+        required: true
+        type: choice
+        default: '100'
+        options: ['2', '20', '100']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v461-benchmark-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  simulate:
+    strategy:
+      fail-fast: false
+      matrix:
+        map: [vanta, frostline, kairo, cargo]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      V461_MAP: ${{ matrix.map }}
+      V461_ROUNDS: ${{ github.event_name == 'workflow_dispatch' && inputs.rounds || '2' }}
+      V461_SEED: '461000'
+      V461_REPLAY: '1'
+      STRYKE_TEST_URL: http://127.0.0.1:8765/
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate benchmark syntax and map contracts
+        run: |
+          node --check tools/v461_deterministic_benchmark.mjs
+          python3 -m py_compile tools/v461_report.py
+          python3 tools/v45_layout_contract.py
+          python3 tools/v45_route_resilience.py >/tmp/v461-route-scan.json
+      - name: Install Chromium
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 peer@1.0.2 express@4.21.2
+          npx playwright install --with-deps chromium
+      - name: Serve original game locally
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/v461-http.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS -o /dev/null http://127.0.0.1:8765/; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/v461-http.log
+          exit 1
+      - name: Replay seed and simulate independent 5v5 bot rounds
+        run: node tools/v461_deterministic_benchmark.mjs
+      - name: Upload raw tactical telemetry
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v461-${{ matrix.map }}
+          path: reports/v461-${{ matrix.map }}.json
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Local server diagnostics
+        if: failure()
+        run: tail -70 /tmp/v461-http.log || true
+
+  summarize:
+    needs: simulate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v461-*
+          merge-multiple: true
+          path: reports
+      - name: Restore previous comparable report on this branch
+        uses: actions/cache@v4
+        with:
+          path: reports/v461-baseline.json
+          key: v461-baseline-${{ github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            v461-baseline-${{ github.ref_name }}-
+      - name: Aggregate wins, confidence intervals, deaths and baseline changes
+        run: |
+          python3 tools/v461_report.py --directory reports \
+            --baseline reports/v461-baseline.json \
+            --output reports/v461-summary.json
+      - name: Upload consolidated benchmark report
+        uses: actions/upload-artifact@v4
+        with:
+          name: v461-consolidated-${{ github.run_id }}
+          path: reports/v461-summary.json
+          retention-days: 30
