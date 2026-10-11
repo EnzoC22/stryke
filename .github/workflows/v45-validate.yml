@@ -7,6 +7,7 @@ on:
       - index.html
       - .github/workflows/v45-validate.yml
       - tools/v45_layout_contract.py
+      - tools/v45_route_resilience.py
   workflow_dispatch:
 permissions:
   contents: read
@@ -21,6 +22,8 @@ jobs:
           node-version: '22'
       - name: Check authored spawn bases and freeze barriers
         run: python3 tools/v45_layout_contract.py
+      - name: Check alternative routes and tactical choke points (read-only)
+        run: python3 tools/v45_route_resilience.py
       - name: Install Chromium for map collision and nav testing
         run: |
           npm install --no-save --no-package-lock playwright@1.56.1 peer@1.0.2 express@4.21.2
