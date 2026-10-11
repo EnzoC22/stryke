@@ -28,24 +28,23 @@ jobs:
           node --check tools/v441_peer_server.mjs
       - name: Install browser and local signaling
         run: |
-          npm install --no-save --no-package-lock playwright@1.56.1 peer@1.0.2
+          npm install --no-save --no-package-lock playwright@1.56.1 peer@1.0.2 express@4.21.2
           npx playwright install --with-deps chromium
-      - name: Start STRYKE site and PeerJS signaling locally
+      - name: Start STRYKE and PeerJS on same origin
         run: |
           node tools/v441_peer_server.mjs >/tmp/v441-peer.log 2>&1 &
-          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/v441-http.log 2>&1 &
           for i in {1..30}; do
-            if curl -fsS -o /dev/null http://127.0.0.1:8765/ && bash -c "echo > /dev/tcp/127.0.0.1/9000" 2>/dev/null; then
-              echo "Ready: STRYKE local website and PeerJS server"
+            if curl -fsS -o /dev/null http://127.0.0.1:9000/; then
+              echo "Ready: STRYKE local website and PeerJS on a single origin"
               exit 0
             fi
             sleep 1
           done
-          cat /tmp/v441-peer.log /tmp/v441-http.log
+          cat /tmp/v441-peer.log
           exit 1
       - name: Two real browsers - lobby, synchronization, rounds and disconnect
         env:
-          STRYKE_TEST_URL: http://127.0.0.1:8765/
+          STRYKE_TEST_URL: http://127.0.0.1:9000/
         run: node tools/v441_multiplayer_smoke.mjs
       - name: PeerJS server diagnostics
         if: failure()
