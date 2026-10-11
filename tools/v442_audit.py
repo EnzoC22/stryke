@@ -24,3 +24,13 @@ for needle in needles:
     print('\n@@',needle,'LINE',idx+1)
     for j in range(max(0,idx-2),min(len(lines),idx+n)):
       print(f'{j+1}: {lines[j][:400]}')
+
+print("\n=== C.BOMB uses ===")
+for i,line in enumerate(lines):
+  if "C.bomb" in line or "m.bomb" in line:
+    print(i+1,line[:1000])
+print("\n=== ON MSG state handler ===")
+for i,line in enumerate(lines):
+  if "case 'state':" in line:
+    for j in range(i,min(len(lines),i+30)):print(j+1,lines[j][:800])
+    break
