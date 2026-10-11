@@ -31,7 +31,7 @@ function instrument(html) {
     '    LB.getForm = () => ({...old(),mode:"rounds",preset:"competitive",map:"vanta",rounds:3,bots:0});',
     '  },',
     '  startMatch() { if (!NET.isHost || !S.lobby) throw Error("Not host lobby"); lobbyStart(); },',
-    '  endRound() { if (!NET.isHost || !["freeze","live"].includes(S.phase)) throw Error("Round not active"); srvEndRound("t","tempo"); },',
+    '  endRound(team="t") { if (!NET.isHost || !["freeze","live"].includes(S.phase)) throw Error("Round not active"); if (team === "lead") team=S.score.t>=S.score.ct?"t":"ct"; srvEndRound(team,"tempo"); },',
     '  nextRound() { if (!NET.isHost || S.phase!=="end") throw Error("Not in round-end"); srvStartRound(); srvState(); },',
     '  closeLink() { if (NET.isHost || !NET.hostConn?.open) throw Error("No guest link"); NET.hostConn.close(); },',
     '  snapshot() {',
@@ -123,7 +123,7 @@ try {
   console.log('PASS two-browser PeerJS lobby join, unique players, roster sync');
 
   await host.evaluate(() => window.__v441.configureRounds());
-  await host.evaluate(() => window.__v441.startMatch());
+  await host.locator("#lbGo").click({timeout:12000});
   await until(host,() => window.__v441.snapshot().inGame &&
       window.__v441.snapshot().round===1, 'host round one',60000);
   await until(guest,() => {
@@ -149,10 +149,12 @@ try {
   await until(guest,() => window.__v441.snapshot().score?.t===2,'second round result',20000);
   await host.evaluate(() => window.__v441.nextRound());
   await until(guest,() => window.__v441.snapshot().round===3,'third round',20000);
-  await host.evaluate(() => window.__v441.endRound());
+  assert.equal((await state(guest)).score?.ct,2,'half-time must transfer score with swapped sides');
+  console.log('PASS half-time side switch and team-aligned score transfer');
+  await host.evaluate(() => window.__v441.endRound("lead"));
   await until(guest,() => {
     const s=window.__v441.snapshot();
-    return s.phase==='over' && s.score?.t===3;
+    return s.phase==='over' && Math.max(s.score?.t||0,s.score?.ct||0)===3;
   },'match victory replicated',20000);
   console.log('PASS victory, score and match completion replicated');
 
