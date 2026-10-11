@@ -1,0 +1,59 @@
+name: V46 Tactical Bot Simulation
+
+on:
+  push:
+    branches: [main, v46-bot-match-telemetry]
+    paths:
+      - index.html
+      - tools/v46_bot_match_simulation.mjs
+      - .github/workflows/v46-bot-simulation.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax and V45 map contracts
+        run: |
+          node --check tools/v46_bot_match_simulation.mjs
+          python3 tools/v45_layout_contract.py
+          python3 tools/v45_route_resilience.py > /tmp/v46-route-audit.json
+      - name: Install Chromium and Playwright
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 peer@1.0.2 express@4.21.2
+          npx playwright install --with-deps chromium
+      - name: Start local production game
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/v46-http.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS -o /dev/null http://127.0.0.1:8765/; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/v46-http.log
+          exit 1
+      - name: Run 5v5 bot simulation on Vanta, Frostline, Kairo and Cargo
+        env:
+          STRYKE_TEST_URL: http://127.0.0.1:8765/
+          V46_ROUNDS: '2'
+        run: node tools/v46_bot_match_simulation.mjs
+      - name: Upload route / round telemetry
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v46-tactical-bot-telemetry
+          path: reports/v46-bot-simulation.json
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Server diagnostics on failure
+        if: failure()
+        run: tail -80 /tmp/v46-http.log || true
