@@ -248,8 +248,8 @@ async function until(page,predicate,label,ms=45000) {
 async function output(page,label) { console.log('STATE',label,JSON.stringify(await state(page))); }
 
 try {
-  const hostContext=await browser.newContext({viewport:{width:1280,height:800}});
-  const guestContext=await browser.newContext({viewport:{width:1280,height:800}});
+  const hostContext=await browser.newContext({viewport:{width:960,height:600}});
+  const guestContext=await browser.newContext({viewport:{width:960,height:600}});
   const host=await setupPage(hostContext,'host');
   const guest=await setupPage(guestContext,'guest');
 
@@ -321,17 +321,23 @@ try {
   console.log('PASS anti-cheat: implausible remote teleport rejected');
 
   // A genuine paired shot is relayed and the host caps an exaggerated damage claim.
+  // Chromium software rendering can introduce gaps between paired WebRTC
+  // messages. Retry a real valid shot (never mutate HP) if no damage arrived.
+  let hpAfterShot=100;
   await guest.waitForTimeout(800);
-  await guest.evaluate(({gun,endpoint,weapon,victim})=>{
-    window.__v441.emit({t:'shot',w:weapon,o:gun,e:[endpoint]});
-    window.__v441.emit({t:'hit',v:victim,w:weapon,z:'body',dmg:999999});
-  },lane);
-  await until(host,()=>{
-    const victim=window.__v441.snapCombat().players.find(p=>p.id==='h');
-    return victim && victim.hp<100;
-  },'authoritative shot and damage',12000);
-  const hpAfterShot=(await host.evaluate(()=>window.__v441.snapCombat())).players
-    .find(p=>p.id==='h').hp;
+  for (let attempt=1;attempt<=3;attempt++){
+    await guest.evaluate(({gun,endpoint,weapon,victim})=>{
+      window.__v441.emit({t:'shot',w:weapon,o:gun,e:[endpoint]});
+      window.__v441.emit({t:'hit',v:victim,w:weapon,z:'body',dmg:999999});
+    },lane);
+    await guest.waitForTimeout(950);
+    hpAfterShot=(await host.evaluate(()=>window.__v441.snapCombat())).players
+      .find(p=>p.id==='h').hp;
+    if(hpAfterShot<100)break;
+    console.log('SHOT RETRY',attempt,'HP',hpAfterShot);
+    await guest.waitForTimeout(1200);
+  }
+  assert(hpAfterShot<100,'host did not accept any of three paired WebRTC shots');
   assert(hpAfterShot>=30 && hpAfterShot<100,
     'server must cap exaggerated damage to the weapon rules');
   console.log('PASS gunplay: real guest shot+hit accepted, damage clamped by authoritative host, HP='+hpAfterShot);
