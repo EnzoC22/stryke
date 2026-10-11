@@ -18,7 +18,7 @@ const browser = await chromium.launch({ headless: true,
 function instrument(html) {
   const anchor = /<\/script>\s*<\/body>/i;
   assert(anchor.test(html), 'Final inline game module not found');
-  const hook = String.raw\`
+  const hook = String.raw`
     // V46 test fixture. None of this is present in deployed production HTML.
     window.__strykeV46 = {
       simulationTime: 0, startTime: 0, roundNumber: 0, current: null,
@@ -101,7 +101,7 @@ function instrument(html) {
       roundReport(){return JSON.parse(JSON.stringify(this.current));},
       roster(){return [...S.players.values()].map(p=>({id:p.id,team:p.team,alive:p.alive,bot:p.isBot,role:p.bot?.role}));}
     };
-  \`;
+  `;
   return html.replace(anchor, hook+'\n$&');
 }
 
