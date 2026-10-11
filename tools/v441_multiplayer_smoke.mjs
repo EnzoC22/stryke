@@ -30,7 +30,14 @@ function instrument(html) {
     '    const old = LB.getForm;',
     '    LB.getForm = () => ({...old(),mode:"rounds",preset:"competitive",map:"vanta",rounds:3,bots:0});',
     '  },',
-    '  startMatch() { if (!NET.isHost || !S.lobby) throw Error("Not host lobby"); lobbyStart(); },',
+    '  startMatch() { if (!NET.isHost || !S.lobby) throw Error("Not host lobby"); lobbyStart(); },
+  buyKevlar() { if (NET.isHost || !inGame) throw Error("Guest not in game"); sendToHost({t:"buy",it:"kevlar"}); },
+  sendChat(value) { if (!inGame) throw Error("Cannot chat outside match"); sendToHost({t:"chat",txt:value}); },
+  configureFiveVsFive() {
+    if (!NET.isHost || !S.lobby || typeof LB.getForm !== "function") throw Error("Not host lobby");
+    const previous = LB.getForm;
+    LB.getForm = () => ({...previous(),mode:"rounds",preset:"competitive",map:"cargo",rounds:3,bots:8});
+  },',
     '  endRound(team="t") { if (!NET.isHost || !["freeze","live"].includes(S.phase)) throw Error("Round not active"); if (team === "lead") team=S.score.t>=S.score.ct?"t":"ct"; srvEndRound(team,"tempo"); },',
     '  nextRound() { if (!NET.isHost || S.phase!=="end") throw Error("Not in round-end"); srvStartRound(); srvState(); },',
     '  closeLink() { if (NET.isHost || !NET.hostConn?.open) throw Error("No guest link"); NET.hostConn.close(); },',
@@ -39,10 +46,20 @@ function instrument(html) {
     '    return { host, online:!!NET.online, code:NET.code, joining:!!NET.joining,',
     '      connected:!!NET.hostConn?.open, inGame:!!inGame, lobby:!!(host?S.lobby:LB.on),',
     '      lobbyVisible:!$("#lobby").classList.contains("hidden"),',
-    '      myId:C.myId, mode:(host?S.st:C.st)?.mode, map:(host?S.st:C.st)?.map,',
+    '      myId:C.myId, mode:(host?S.st:C.st)?.mode, map:(host?S.st:C.st)?.map,
+      myMoney:me.money, myArmor:me.armor, myAlive:me.alive,
+      botCount:host?[...S.players.values()].filter(p=>p.isBot).length:null,
+      teamCounts:host?{
+        t:[...S.players.values()].filter(p=>p.team==="t").length,
+        ct:[...S.players.values()].filter(p=>p.team==="ct").length
+      }:{
+        t:[...C.players.values()].filter(p=>p.tm==="t").length,
+        ct:[...C.players.values()].filter(p=>p.tm==="ct").length
+      },
+      chatText:$("#chatlog")?.textContent?.slice(-350)||"",',
     '      round:host?S.round:C.round, phase:host?S.phase:C.phase,',
     '      score:host?S.score:C.sc,',
-    '      livePlayers:host?[...S.players.values()].filter(p=>!p.isBot).map(p=>({id:p.id,name:p.name,team:p.team,alive:p.alive, money:p.money})):',
+    '      livePlayers:host?[...S.players.values()].filter(p=>!p.isBot).map(p=>({id:p.id,name:p.name,team:p.team,alive:p.alive,armor:p.armor, money:p.money})):',
     '        [...C.players.values()].map(p=>({id:p.id,name:p.n,team:p.tm,alive:p.al})),',
     '      roster:(LB.data?.pl||[]).map(p=>({id:p.id,name:p.n,team:p.tm})),',
     '      joinStatus:$("#joinStatus")?.textContent || "",',
@@ -134,6 +151,22 @@ try {
   await output(guest,'game started guest');
   console.log('PASS round one starts on host and guest with both players');
 
+  await guest.evaluate(() => window.__v441.buyKevlar());
+  await until(host,() => {
+    const p=window.__v441.snapshot().livePlayers.find(p=>p.name==="V441 Guest");
+    return p && p.armor===100 && p.money===150;
+  },'host validates guest armor purchase',12000);
+  await until(guest,() => {
+    const s=window.__v441.snapshot();
+    return s.myArmor===100 && s.myMoney===150;
+  },'guest receives purchased armor state',12000);
+  console.log('PASS remote purchase: guest buys kevlar and server/client economy matches');
+
+  await guest.evaluate(() => window.__v441.sendChat('V441 SYNC TEST'));
+  await until(host,() => window.__v441.snapshot().chatText.includes('V441 SYNC TEST'),
+    'host receives guest chat',12000);
+  console.log('PASS guest chat replicated to host');
+
   await host.evaluate(() => window.__v441.endRound());
   await until(guest,() => {
     const s=window.__v441.snapshot();return s.score?.t===1 && s.phase==='end';
@@ -163,6 +196,20 @@ try {
   await until(host,() => window.__v441.snapshot().lobby && !window.__v441.snapshot().inGame,
     'host returns to lobby',10000);
   console.log('PASS match-end return to lobby on two browsers');
+
+  await host.evaluate(() => window.__v441.configureFiveVsFive());
+  await host.locator('#lbGo').click({timeout:12000});
+  await until(host,() => {
+    const s=window.__v441.snapshot();
+    return s.inGame && s.round===1 && s.botCount===8 &&
+      s.teamCounts.t===5 && s.teamCounts.ct===5;
+  },'host 5v5 bots balance',20000);
+  await until(guest,() => {
+    const s=window.__v441.snapshot();
+    return s.inGame && s.livePlayers.length===10 &&
+      s.teamCounts.t===5 && s.teamCounts.ct===5;
+  },'guest receives full 5v5 world',45000);
+  console.log('PASS 5v5: two live humans + eight bots, both teams have five players and clients agree');
 
   await guest.evaluate(() => window.__v441.closeLink());
   await until(host,() => window.__v441.snapshot().livePlayers.length===1,
