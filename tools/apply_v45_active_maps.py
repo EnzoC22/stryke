@@ -39,16 +39,17 @@ new="['Base Defesa',10,16,2,5]"
 if s.count(old)!=1:raise SystemExit('Kairo V36 callout missing')
 s=s.replace(old,new,1)
 s=s.replace('\nfunction buildMap(id) {','\n'+tag+'\nfunction buildMap(id) {',1)
-# The modified grid parser inserts only whitespace-only lines in its own sections.
-# Remove those only inside an active-map definition and preserve other source.
+# Strip regenerated whitespace-only grid lines in both archived and active
+# versions, without touching unrelated game HTML.
 for name in ('frostline','kairo'):
- matches=list(re.finditer(r'MAPS\.'+name+r'\s*=\s*gridMap\(\[',s))
- if len(matches)!=3:raise SystemExit('Unexpected map count')
- m=matches[-1];tail=s.find('],',m.end())
- if tail<0:raise SystemExit('Missing closing grid')
- section=s[m.start():tail]
- section='\n'.join(line.rstrip() for line in section.split('\n'))
- s=s[:m.start()]+section+s[tail:]
+    matches=list(re.finditer(r'MAPS\.'+name+r'\s*=\s*gridMap\(\[',s))
+    if len(matches)!=3:raise SystemExit('Unexpected map count')
+    for m in reversed(matches):
+        end=s.find('],',m.end())
+        if end<0:raise SystemExit('Missing closing grid')
+        section=s[m.start():end]
+        cleaned='\n'.join(line.rstrip() for line in section.split('\n'))
+        s=s[:m.start()]+cleaned+s[end:]
 if abs(len(s)-len(before))>2100:raise SystemExit('Unexpected HTML diff width')
 p.write_text(s,encoding='utf-8')
 print('V45 active Frostline/Kairo spawn grids corrected, 5 defenders each')
