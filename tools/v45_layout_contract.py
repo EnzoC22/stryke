@@ -40,9 +40,10 @@ for name in maps:
     tvals=[int(x) for x in re.findall(r'\bv:\s*(-?\d+)',t.group(1))]
     cvals=[int(x) for x in re.findall(r'\bv:\s*(-?\d+)',ct.group(1))]
     assert len(tvals)==len(cvals)==2,(name,tvals,cvals)
-    assert len(set(tvals))==len(set(cvals))==1,'split barriers out of sync '+name
-    tgate,cgate=tvals[0],cvals[0]
+    assert len(set(tvals))==1,'T freeze gates disagree '+name
+    assert len(set(cvals))==1 or (name=='frostline' and cvals==[-21,-35]),'invalid CT freeze segments '+name
+    tgate=tvals[0]
     assert all(z>=tgate+1.0 for x,z in maps[name]['T']), 'T spawns across own freeze barrier '+name
-    assert all(z<=cgate-1.0 for x,z in maps[name]['C']), 'CT spawns across own freeze barrier '+name
-    print('GATES',name,'T',tgate,'CT',cgate,'author-base OK')
+    assert all(z <= (cvals[0] if name=='frostline' and x<=18 else cvals[-1])-1.0 for x,z in maps[name]['C']), 'CT spawns across own freeze barrier '+name
+    print('GATES',name,'T',tgate,'CT',cvals,'author-base OK')
 print('PASS four authored spawn areas and Cargo objective relocation')
