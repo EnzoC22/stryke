@@ -75,7 +75,8 @@ def proposals(src,maps,metrics):
             if d['plant_tiles']<5:
                 add(92,'bombsite',f'{name}: ampliar espaço utilizável em {site}',
                     f'Apenas {d["plant_tiles"]} células de plant no grid')
-    if "return [[bx, bz]];" in src[src.index('function navPath('):src.index('function navPath(')+3000]:
+    nav_start=src.find('function navPath(')
+    if nav_start>=0 and "return [[bx, bz]];" in src[nav_start:nav_start+3000]:
         add(97,'bots','Impedir caminhos diretos por paredes','Fallback inseguro detectado em navPath',True)
     if "V44.2: a defuse cannot win" not in src:
         add(97,'bomba','Restaurar precedência da explosão','Guard V44.2 contra defuse tardio ausente',True)
