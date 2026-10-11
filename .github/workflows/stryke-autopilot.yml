@@ -1,0 +1,125 @@
+name: STRYKE Autonomous Improvement Cycle
+
+on:
+  schedule:
+    # Every 20 minutes (GitHub can delay scheduled jobs).
+    - cron: '7,27,47 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main, v45-map-spawns-and-routes-overhaul]
+    paths:
+      - .github/workflows/stryke-autopilot.yml
+      - tools/stryke_improvement_cycle.py
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: stryke-autopilot
+  cancel-in-progress: false
+
+jobs:
+  analyze-and-guarded-fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Four ranked improvements and guarded automatic repairs
+        run: |
+          python3 -m py_compile tools/stryke_improvement_cycle.py
+          python3 tools/stryke_improvement_cycle.py --apply
+      - name: Static integrity and objective safety
+        run: |
+          set -euo pipefail
+          python3 tools/v45_layout_contract.py
+          node tools/v442_bomb_race_unit.mjs
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import subprocess,sys
+          class Scripts(HTMLParser):
+              def __init__(self):super().__init__();self.active=False;self.parts=[];self.blocks=[]
+              def handle_starttag(self,tag,attrs):
+                  if tag=='script':
+                      a=dict(attrs)
+                      self.active='src' not in a and a.get('type','').lower() in ('','text/javascript','module')
+                      self.parts=[]
+              def handle_data(self,chunk):
+                  if self.active:self.parts.append(chunk)
+              def handle_endtag(self,tag):
+                  if tag=='script':
+                      if self.active:self.blocks.append(''.join(self.parts))
+                      self.active=False
+          h=Scripts();h.feed(Path('index.html').read_text(encoding='utf-8'))
+          if not h.blocks:sys.exit('No scripts found')
+          for n,src in enumerate(h.blocks,1):
+              v=subprocess.run(['node','--input-type=module','--check'],input=src,text=True,capture_output=True)
+              if v.returncode:sys.exit(f'Inline JS {n} invalid: {v.stderr}')
+          print('PASS static JavaScript:',len(h.blocks),'blocks')
+          PY
+          git diff --check
+          test -z "$(git diff --name-only | grep -v '^index.html$' || true)"
+      - name: Mark whether an actual validated repair was proposed
+        id: change
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No verified repair required; original game remains untouched"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --stat -- index.html
+          fi
+      - name: Install Chromium only when code changed
+        if: steps.change.outputs.changed == 'true'
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Serve potential update locally
+        if: steps.change.outputs.changed == 'true'
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/stryke-auto-http.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS -o /dev/null http://127.0.0.1:8765/; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/stryke-auto-http.log
+          exit 1
+      - name: Run map and mobile browser regressions before committing
+        if: steps.change.outputs.changed == 'true'
+        env:
+          STRYKE_TEST_URL: http://127.0.0.1:8765/
+        run: |
+          node tools/v44_map_smoke.mjs
+          node tools/v43_mobile_smoke.mjs
+      - name: Commit only approved code repairs
+        if: steps.change.outputs.changed == 'true' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "STRYKE Quality Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "fix(ci): verified STRYKE autonomous regression repair"
+          git push origin HEAD:main
+      - name: Re-run production deployment and integration checks after repair
+        if: steps.change.outputs.changed == 'true' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run pages.yml --ref main
+          gh workflow run v45-validate.yml --ref main
+          gh workflow run v441-multiplayer.yml --ref main
+          gh workflow run v442-combat.yml --ref main
+      - name: Archive four ranked ideas and geometry measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stryke-improvement-cycle
+          path: reports/stryke-cycle-latest.json
+          if-no-files-found: warn
+          retention-days: 7
