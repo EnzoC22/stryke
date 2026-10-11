@@ -135,6 +135,14 @@ window.__v441 = {
     if(!NET.isHost||S.bomb?.st!=="planted")throw Error("Not a planted bomb");
     S.bomb.end=now-.25;bombTick();srvState();
   },
+  expireDuringDefuse(){
+    if(!NET.isHost||S.bomb?.st!=="planted")throw Error("Not a planted bomb");
+    const ct=[...S.players.values()].find(p=>p.team==="ct"&&p.act?.k==="d");
+    if(!ct)throw Error("No active CT defuse");
+    // Test-only deadlines on the same host tick: explosion must beat late defuse.
+    S.bomb.end=now-.25;ct.act.end=now-.2;
+    bombTick();srvState();
+  },
   snapCombat(){
     const host=NET.isHost;
     return {
@@ -372,6 +380,27 @@ try {
   await until(guest,()=>window.__v441.snapCombat().phase==='end' &&
     window.__v441.snapCombat().score?.t===1,'explosion victory replicated',16000);
   console.log('PASS bomb: explosion and attacker victory replicated');
+
+  // Third round: sides switch; guest now plants through WebRTC and host defuses.
+  // Force both deadlines into one host tick to expose an objective-ordering race.
+  const raceStage=await host.evaluate(()=>window.__v441.bombSetup());
+  console.log('BOMB_EXPIRY_RACE_FIXTURE',JSON.stringify(raceStage));
+  assert.equal(raceStage.attacker,'p1','half-time must make remote guest attacker');
+  assert.equal(raceStage.defender,'h','half-time must make host defender');
+  await guest.evaluate(()=>window.__v441.emit({t:'bomb',on:1}));
+  await until(host,()=>window.__v441.snapCombat().bomb?.st==='planted',
+    'remote attacker plants over WebRTC',12000);
+  console.log('PASS bomb: remote attacker plants through genuine WebRTC packet');
+  await host.evaluate(()=>window.__v441.hostEmit({t:'bomb',on:1}));
+  await until(host,()=>window.__v441.snapCombat().players.some(p=>p.id==='h'&&p.act==='d'),
+    'host defender begins defuse',8000);
+  await host.evaluate(()=>window.__v441.expireDuringDefuse());
+  const raceResult=await host.evaluate(()=>window.__v441.snapCombat());
+  assert.equal(raceResult.bomb?.st,'exploded',
+    'expired bomb must explode instead of granting late defuse on the same tick');
+  await until(guest,()=>window.__v441.snapshot().bombState==='exploded',
+    'simultaneous bomb deadline replicated',12000);
+  console.log('PASS objective ordering: bomb expiration beats late defuse on the same tick');
 
   // RTT-resistant message channel: introduce test-only 450ms delay on one chat message.
   await guest.evaluate(()=>{
