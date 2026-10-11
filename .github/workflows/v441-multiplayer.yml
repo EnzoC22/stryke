@@ -1,0 +1,51 @@
+name: V44.1 Two-Player WebRTC Regression
+
+on:
+  push:
+    branches: [main, v44-1-multiplayer-stability]
+    paths:
+      - .github/workflows/v441-multiplayer.yml
+      - tools/v441_multiplayer_smoke.mjs
+      - tools/v441_peer_server.mjs
+      - index.html
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  multiplayer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check integration harness syntax
+        run: |
+          node --check tools/v441_multiplayer_smoke.mjs
+          node --check tools/v441_peer_server.mjs
+      - name: Install browser and local signaling
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1 peer@1.0.2 express@4.21.2
+          npx playwright install --with-deps chromium
+      - name: Start STRYKE and PeerJS on same origin
+        run: |
+          node tools/v441_peer_server.mjs >/tmp/v441-peer.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS -o /dev/null http://127.0.0.1:9000/; then
+              echo "Ready: STRYKE local website and PeerJS on a single origin"
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/v441-peer.log
+          exit 1
+      - name: Two real browsers - lobby, synchronization, rounds and disconnect
+        env:
+          STRYKE_TEST_URL: http://127.0.0.1:9000/
+        run: node tools/v441_multiplayer_smoke.mjs
+      - name: PeerJS server diagnostics
+        if: failure()
+        run: tail -100 /tmp/v441-peer.log
