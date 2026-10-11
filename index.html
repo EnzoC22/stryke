@@ -1795,11 +1795,12 @@ MAPS.vanta=gridMap([
 
 MAPS.frostline=gridMap([
 
+
   '#####################',
-  '##########.....CCCC##',
+  '##########....CCCCC##',
   '####....##.......####',
   '###.BBB.....#...#####',
-  '###.BiB.#####C.######',
+  '###.BiB.#####..######',
   '###.BBh.#####..######',
   '####....#####...#####',
   '####...######...#####',
@@ -1815,6 +1816,7 @@ MAPS.frostline=gridMap([
   '##TTT.###############',
   '#####################',
 
+
 ],4.8,{name:'Frostline // V35 Compact',desc:'V35: base mais claustrofóbica, service lanes fechadas e entradas de site controladas',vibe:'frostline',
   sky:0xaec5d8,skyTop:0x536f8d,fogC:0xaebfca,fog:[74,195],sun:[-22,38,18],hemi:.90,sunI:.64,exposure:.66,
   theme:{floor:['snow',0xdde8ed],wall:['concrete',0xaebbc3],crate:['crate',0x62727e],metal:['metal',0x56636d],stone:['concrete',0x9ba8b0],roof:['metal',0x48545d]},
@@ -1824,10 +1826,11 @@ v23Extra(MAPS.frostline,[B(-4.8,0,1.0,3.2,3.1,'metal'),B(4.8,0,1.0,3.2,3.1,'meta
 // Kairo continua com a planta aprovada da V22, mas recebe o mesmo tratamento de leitura/performance da V23.
 MAPS.kairo=gridMap([
 
+
   '#################',
   '#.....###########',
   '#.BBB.##........#',
-  '#.BiB.....C.CCCC#',
+  '#.BiB......CCCCC#',
   '#.BBh.#####.###.#',
   '###...#####..####',
   '###..####....####',
@@ -1840,6 +1843,7 @@ MAPS.kairo=gridMap([
   '#TTT.####....####',
   '#.........#######',
   '#################',
+
 
 ],6,{name:'Kairo // V35 Compact',desc:'V35: quarteirão denso, Crossroad menor e menos linhas de visão longas',vibe:'kairo',
   sky:0x111a2a,skyTop:0x060910,fogC:0x101722,fog:[78,215],sun:[18,34,-20],hemi:.68,sunI:.34,sunC:0x9fbbe8,exposure:.69,stars:1,
@@ -2319,51 +2323,55 @@ function v36CargoBuild(M){
     areasC:[['B Compound',3,8,2,6],['North Hall',7,17,2,5],['Base Defesa',15,20,2,5],['East Hall',16,20,4,13],['A Rooms',13,19,12,16],['Mid Hall',7,15,9,13],['Hotel',7,11,6,10],['West Route',2,7,9,17],['Base Ataque',2,8,17,19]]});
 
   MAPS.frostline=gridMap([
-'#####################',
-'##########....CCCCC##',
-'####....##.......####',
-'###.BBB.....#...#####',
-'###.BiB.#####..######',
-'###.BBh.#####..######',
-'####....#####...#####',
-'####...######...#####',
-'#####..#######..#####',
-'#####..#######..#####',
-'##..rr.#....##.rr..##',
-'##.hrr......#..rri.##',
-'##..rr.##....#..rr.##',
-'####...##.AAAAA.#####',
-'####...##.AAhAA.#####',
-'####..###.AAiAA.#####',
-'##TT..###..##...#####',
-'##TTT.###############',
-'#####################'
+
+  '#####################',
+  '##########.....CCCC##',
+  '####....##.......####',
+  '###.BBB.....#...#####',
+  '###.BiB.#####C.######',
+  '###.BBh.#####..######',
+  '####....#####...#####',
+  '####...######...#####',
+  '#####..#######..#####',
+  '#####..#######..#####',
+  '##..rr.#....##.rr..##',
+  '##.hrr......#..rri.##',
+  '##..rr.##....#..rr.##',
+  '####...##.AAAAA.#####',
+  '####...##.AAhAA.#####',
+  '####..###.AAiAA.#####',
+  '##TT..###..##...#####',
+  '##TTT.###############',
+  '#####################',
+
 ],4.8,{name:'Frostline // V36 Lab Complex',desc:'warehouse/lab reference: salas ligadas por service corridors e fatal funnels curtos',vibe:'frostline',
     sky:0xaec5d8,skyTop:0x536f8d,fogC:0xaebfca,fog:[74,195],sun:[-22,38,18],hemi:.90,sunI:.64,exposure:.66,
     theme:{floor:['snow',0xdde8ed],wall:['concrete',0xaebbc3],crate:['crate',0x62727e],metal:['metal',0x56636d],stone:['concrete',0x9ba8b0],roof:['metal',0x48545d]},build:v23MapBuild,
-    areasC:[['Base Defesa',10,18,1,4],['Hangar B',3,8,3,6],['West Service',3,8,6,13],['Central Lab',7,13,9,13],['Reactor A',9,17,13,16],['East Service',14,19,7,13],['Covered Hall',3,18,10,12],['Base Ataque',2,7,16,18]]});
+    areasC:[['Base Defesa',10,18,1,4],['CT Outpost',12,15,3,5],['Hangar B',3,8,3,6],['West Service',3,8,6,13],['Central Lab',7,13,9,13],['Reactor A',9,17,13,16],['East Service',14,19,7,13],['Covered Hall',3,18,10,12],['Base Ataque',2,7,16,18]]});
 
   MAPS.kairo=gridMap([
-'#################',
-'#.....###########',
-'#.BBB.##........#',
-'#.BiB......CCCCC#',
-'#.BBh.#####.###.#',
-'###...#####..####',
-'###..####....####',
-'##...####..#.####',
-'##...##r#..######',
-'##.h.rrr...#.####',
-'##..####.AAA.####',
-'#...####.AhA.####',
-'#TT..###.AiA.####',
-'#TTT.####....####',
-'#.........#######',
-'#################'
+
+  '#################',
+  '#.....###########',
+  '#.BBB.##........#',
+  '#.BiB.....C.CCCC#',
+  '#.BBh.#####.###.#',
+  '###...#####..####',
+  '###..####....####',
+  '##...####..#.####',
+  '##...##r#..######',
+  '##.h.rrr...#.####',
+  '##..####.AAA.####',
+  '#...####.AhA.####',
+  '#TT..###.AiA.####',
+  '#TTT.####....####',
+  '#.........#######',
+  '#################',
+
 ],6,{name:'Kairo // V36 Urban Interior',desc:'office/store reference: quarteirão dividido em interiores curtos, lobby central e pockets urbanos',vibe:'kairo',
     sky:0x111a2a,skyTop:0x060910,fogC:0x101722,fog:[78,215],sun:[18,34,-20],hemi:.68,sunI:.34,sunC:0x9fbbe8,exposure:.69,stars:1,
     theme:{floor:['asphalt',0x26323d],wall:['concrete',0x34414d],crate:['crate',0x5b4b47],metal:['metal',0x25313b],stone:['concrete',0x4a5662],roof:['metal',0x1d2730]},build:v23MapBuild,
-    areasC:[['B Metro',1,6,1,5],['North Offices',7,15,1,5],['Base Defesa',11,16,2,5],['Lobby / Mid',4,11,7,10],['Market Rooms',2,8,8,12],['A Plaza',8,13,10,13],['South Entry',1,7,12,15],['Base Ataque',1,5,12,14]]});
+    areasC:[['B Metro',1,6,1,5],['North Offices',7,15,1,5],['Base Defesa',10,16,2,5],['Lobby / Mid',4,11,7,10],['Market Rooms',2,8,8,12],['A Plaza',8,13,10,13],['South Entry',1,7,12,15],['Base Ataque',1,5,12,14]]});
 
   MAPS.cargo=gridMap([
 
@@ -17039,6 +17047,7 @@ if (MAPS.frostline?.spawnsB?.length === 5 && MAPS.kairo?.spawnsB?.length === 5) 
 // Cargo attacker starts use the authored T-only spawn grid, not center lane.
 
 /* V45 TWO-LANE ATTACKER ACCESS */
+/* V45 ACTIVE V36 MAP BASE CORRECTION */
 function buildMap(id) {
   const M = MAPS[id] || MAPS.arena; curMapId = MAPS[id] ? id : 'arena'; curMap = M; texZ = curMapId === 'vila'; // texturas da fase 3 só na Vila (o Sanatório recebe as dele na fase 5)
   texS = curMapId === 'sanatorio'; // 5B-1
