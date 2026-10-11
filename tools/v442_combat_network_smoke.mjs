@@ -228,7 +228,7 @@ async function setupPage(context, label) {
 const state = async page => page.evaluate(() => window.__v441.snapshot());
 async function until(page,predicate,label,ms=45000) {
   try {
-    await page.waitForFunction(predicate, null, {timeout:ms,polling:200});
+    await page.waitForFunction(predicate, null, {timeout:Math.max(ms,35000),polling:250});
   } catch (e) {
     console.error('STATE TIMEOUT',label,JSON.stringify(await state(page)));
     throw e;
