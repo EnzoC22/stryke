@@ -30,3 +30,10 @@ for lo,hi in [(131,165),(810,868),(21210,21243),(21453,21575),(21888,21997),(266
     print("RANGE",lo,hi)
     for j in range(lo-1,min(hi,len(lines))):
         print(f"{j+1}: {lines[j]}")
+
+for needle in ("function onMsg(", "function srvHandle(", "function lobbyUI(", "function srvTick(", "function updateRoomInfo(", "function teamPick(", "const RC =", "const PEER_PREFIX", "function clientHeartbeat(", "function requestLock("):
+    hits=[i for i,line in enumerate(lines) if needle in line]
+    for i in hits[:2]:
+        print("GAME DETAIL",needle,"AT",i+1)
+        for j in range(i,min(len(lines),i+100 if needle in ("function onMsg(","function srvHandle(","function lobbyUI(") else i+35)):
+            print(f"{j+1}: {lines[j]}")
