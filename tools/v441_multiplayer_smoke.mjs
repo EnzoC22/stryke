@@ -53,8 +53,8 @@ function instrument(html) {
   ].join('\n');
   // Test-only CSP adjustment: allow the local PeerServer WebSocket during the test.
   // The checked-in game HTML and its production Content Security Policy stay unchanged.
-  const htmlLocal = html.replace(/<meta\\b[^>]*http-equiv\\s*=\\s*["']Content-Security-Policy["'][^>]*>/gi, '');
-  return htmlLocal.replace(needle, hook + '\n  return html.replace(needle, hook + '\n$&');');
+  const htmlLocal = html.replace(/<meta\b[^>]*http-equiv\s*=\s*["']Content-Security-Policy["'][^>]*>/gi, '');
+  return htmlLocal.replace(needle, hook + '\n$&');
 }
 
 async function setupPage(context, label) {
