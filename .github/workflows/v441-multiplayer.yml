@@ -2,7 +2,7 @@ name: V44.1 Two-Player WebRTC Regression
 
 on:
   push:
-    branches: [v44-1-multiplayer-stability]
+    branches: [main, v44-1-multiplayer-stability]
     paths:
       - .github/workflows/v441-multiplayer.yml
       - tools/v441_multiplayer_smoke.mjs
