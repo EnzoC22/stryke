@@ -8,6 +8,7 @@ on:
       - .github/workflows/v43-browser-smoke.yml
       - tools/v43_mobile_smoke.mjs
       - index.html
+      - v41-menu.css
   workflow_dispatch:
 
 permissions:
