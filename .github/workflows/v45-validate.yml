@@ -5,6 +5,7 @@ on:
     branches: [main, v45-map-spawns-and-routes-overhaul]
     paths:
       - index.html
+      - v41-menu.css
       - .github/workflows/v45-validate.yml
       - tools/v45_layout_contract.py
       - tools/v45_route_resilience.py
