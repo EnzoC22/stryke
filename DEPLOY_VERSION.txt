@@ -1,2 +1,3 @@
-STRYKE 4.9 // V45 TACTICAL MAPS
-Validated game revision: 9d88b42984bffa4fcf4fbf2a2debe68777f64afa
+STRYKE 4.9 // V46.1 DETERMINISTIC BOT BENCHMARK
+Deployed revision: 990d30b510a705c4f5ce65372b9296cb626529d2
+Last gameplay/map change: 36879527fe1898f93a0eb3a99f80f3ec88949701
